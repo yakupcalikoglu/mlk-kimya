@@ -154,6 +154,35 @@ tbody tr:hover td{background:#fafaf8}
 .twoC{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .threeC{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 @media(max-width:900px){.twoC,.threeC{grid-template-columns:1fr}}
+
+/* ── MOBİL LAYOUT ── */
+#sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998}
+#mb-toggle{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:6px 10px;margin-left:-4px}
+
+@media(max-width:768px){
+  #mb-toggle{display:flex;align-items:center;justify-content:center}
+  #sb{
+    position:fixed;left:-240px;top:0;z-index:999;height:100%;
+    transition:left .25s ease;box-shadow:none
+  }
+  #sb.acik{left:0;box-shadow:4px 0 20px rgba(0,0,0,.4)}
+  #sb-overlay.acik{display:block}
+  #main{width:100%}
+  .topbar{padding:0 10px}
+  .tbtn span{display:none}
+  .tbtn{padding:6px 8px;font-size:12px}
+  .page-content{padding:10px}
+  .sg{grid-template-columns:1fr 1fr!important}
+  .sc{padding:10px 12px}
+  .sc .v{font-size:20px}
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:11px}
+  th,td{padding:6px 8px!important}
+  .modal-box{width:95vw!important;max-width:95vw!important;margin:10px}
+  .fg2,.fg3{grid-template-columns:1fr!important}
+  .ch{padding:10px 12px;font-size:13px}
+  .card{margin-bottom:10px}
+}
 .divider{border:none;border-top:1px solid var(--bdr);margin:12px 0}
 .pw{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden;margin-top:3px}
 .pf{height:100%;border-radius:3px}
@@ -239,6 +268,7 @@ body.sadece-goruntule .ch-actions { display: none !important; }
 <div id="app" style="display:none;height:100vh;display:none;flex-direction:row">
 
   <!-- SIDEBAR -->
+  <div id="sb-overlay" onclick="sbKapat()"></div>
   <nav id="sb">
     <div class="sbh">
       <div class="sblogo">
@@ -247,30 +277,30 @@ body.sadece-goruntule .ch-actions { display: none !important; }
       </div>
     </div>
     <div class="sbs"><div class="sbsl">Genel</div>
-      <div class="ni active" onclick="go('ozet',this)"><span class="ic">📊</span>Özet Dashboard</div>
-      <div class="ni" onclick="go('htum',this)"><span class="ic">📋</span>Tüm Hareketler</div>    </div>
+      <div class="ni active" onclick="go('ozet',this)" data-ekran="ozet"><span class="ic">📊</span>Özet Dashboard</div>
+      <div class="ni" onclick="go('htum',this)" data-ekran="htum"><span class="ic">📋</span>Tüm Hareketler</div>    </div>
     <div class="sbs"><div class="sbsl">Finans</div>
-      <div class="ni" onclick="go('mlift',this)"><span class="ic">🏢</span>Marmara Lift</div>
-      <div class="ni" onclick="go('engin',this)"><span class="ic">👤</span>Engin Hesabı</div>
-      <div class="ni" onclick="go('kasa',this)"><span class="ic">💰</span>Operasyonel Kasa</div>
-      <div class="ni" onclick="go('sermaye',this)"><span class="ic">💼</span>Sermaye Ödemeleri</div>
-      <div class="ni" onclick="go('satis',this)"><span class="ic">🛒</span>Satışlar</div>
+      <div class="ni" onclick="go('mlift',this)" data-ekran="mlift"><span class="ic">🏢</span>Marmara Lift</div>
+      <div class="ni" onclick="go('engin',this)" data-ekran="engin"><span class="ic">👤</span>Engin Hesabı</div>
+      <div class="ni" onclick="go('kasa',this)" data-ekran="kasa"><span class="ic">💰</span>Operasyonel Kasa</div>
+      <div class="ni" onclick="go('sermaye',this)" data-ekran="sermaye"><span class="ic">💼</span>Sermaye Ödemeleri</div>
+      <div class="ni" onclick="go('satis',this)" data-ekran="satis"><span class="ic">🛒</span>Satışlar</div>
     </div>
     <div class="sbs"><div class="sbsl">Cari Hesaplar</div>
-      <div class="ni" onclick="go('cariler',this)"><span class="ic">👥</span>Tüm Cariler</div>
+      <div class="ni" onclick="go('cariler',this)" data-ekran="cariler"><span class="ic">👥</span>Tüm Cariler</div>
       <div id="cari-nav-links"></div>
-      <div class="ni" onclick="go('virman',this)"><span class="ic">↔️</span>Cari Virman</div>
+      <div class="ni" onclick="go('virman',this)" data-ekran="virman"><span class="ic">↔️</span>Cari Virman</div>
     </div>
     <div class="sbs"><div class="sbsl">Üretim</div>
-      <div class="ni" onclick="go('uretim',this)"><span class="ic">⚗️</span>Üretim</div>
-      <div class="ni" onclick="go('hammadde',this)"><span class="ic">🧪</span>Hammadde Stoğu</div>
-      <div class="ni" onclick="go('urun_stok',this)"><span class="ic">📦</span>Ürün Stoğu</div>
-      <div class="ni" onclick="go('maliyet',this)"><span class="ic">📐</span>Üretim Maliyeti</div>
+      <div class="ni" onclick="go('uretim',this)" data-ekran="uretim"><span class="ic">⚗️</span>Üretim</div>
+      <div class="ni" onclick="go('hammadde',this)" data-ekran="hammadde"><span class="ic">🧪</span>Hammadde Stoğu</div>
+      <div class="ni" onclick="go('urun_stok',this)" data-ekran="urun_stok"><span class="ic">📦</span>Ürün Stoğu</div>
+      <div class="ni" onclick="go('maliyet',this)" data-ekran="maliyet"><span class="ic">📐</span>Üretim Maliyeti</div>
     </div>
     <div class="sbs"><div class="sbsl">Belgeler & Ayarlar</div>
-      <div class="ni" onclick="go('fatura',this)"><span class="ic">🧾</span>Fatura Kes</div>
-      <div class="ni" onclick="go('rapor',this)"><span class="ic">📊</span>Raporlar</div>
-      <div class="ni" onclick="go('ayarlar',this)"><span class="ic">⚙️</span>Ayarlar</div>
+      <div class="ni" onclick="go('fatura',this)" data-ekran="fatura"><span class="ic">🧾</span>Fatura Kes</div>
+      <div class="ni" onclick="go('rapor',this)" data-ekran="rapor"><span class="ic">📊</span>Raporlar</div>
+      <div class="ni" onclick="go('ayarlar',this)" data-ekran="ayarlar"><span class="ic">⚙️</span>Ayarlar</div>
     </div>
     <div class="sbf">
       <div class="sync"><div class="sdot" id="sdot"></div><span id="stxt">Hazır</span></div>
@@ -283,6 +313,7 @@ body.sadece-goruntule .ch-actions { display: none !important; }
   <!-- MAIN -->
   <div id="main">
     <div class="topbar">
+      <button id="mb-toggle" onclick="sbToggle()" title="Menü">☰</button>
       <div class="topbar-title" id="ptitle">Özet Dashboard</div>
       <div class="topbar-date" id="pdate"></div>
       <button class="tbtn" onclick="undoGoster()" title="Geri Al (son 20 işlem)">↩️ Geri Al</button>
@@ -633,10 +664,123 @@ const DEF_DB = {
    ════════════════════════════════════ */
 
 const USERS = [
-  { id: 1, username: 'yakup',  password: 'marmara54', name: 'Yakup Bey',    role: 'admin'  },
-  { id: 2, username: 'osman',  password: 'osman123',  name: 'Osman Bey',    role: 'cari'   },
-  { id: 3, username: 'engin',  password: 'engin123',  name: 'Engin Güngör', role: 'finans' },
+  // ── Kullanıcılar (DB'den yönetilir, buradaki başlangıç değerleri) ──
+  { id: 1, username: 'yakup', password: 'marmara54', name: 'Yakup Bey', role: 'admin',
+    ozelYetkiler: null, aktif: true },
+  { id: 2, username: 'osman', password: 'osman123',  name: 'Osman Bey', role: 'goruntule',
+    ozelYetkiler: null, aktif: true },
+  { id: 3, username: 'engin', password: 'engin123',  name: 'Engin Güngör', role: 'muhasebe',
+    ozelYetkiler: null, aktif: true },
 ];
+
+// ── Rol Tanımları ──
+const ROL_TANIMLARI = {
+  admin: {
+    ad: 'Yönetici (Admin)',
+    renk: 'bR',
+    ekranlar: ['ozet','htum','mlift','engin','kasa','sermaye','satis','cariler','cari_detail','virman','uretim','hammadde','urun_stok','maliyet','fatura','rapor','ayarlar'],
+    islemler: {
+      cari_ekle: true, cari_sil: true, cari_duzenle: true,
+      hareket_ekle: true, hareket_sil: true, hareket_duzenle: true,
+      uretim_ekle: true, uretim_sil: true,
+      hammadde_ekle: true, hammadde_sil: true,
+      virman_ekle: true, virman_sil: true,
+      ml_ekle: true, ml_sil: true,
+      engin_ekle: true, engin_sil: true,
+      kasa_ekle: true, kasa_sil: true,
+      satis_ekle: true, satis_sil: true,
+      kullanici_yonet: true,
+      db_sifirla: true,
+      yedek_al: true,
+      veri_yukle: true,
+      disa_aktar: true,
+    }
+  },
+  muhasebe: {
+    ad: 'Muhasebe',
+    renk: 'bB',
+    ekranlar: ['ozet','htum','mlift','engin','kasa','sermaye','satis','cariler','cari_detail','virman','rapor'],
+    islemler: {
+      cari_ekle: false, cari_sil: false, cari_duzenle: false,
+      hareket_ekle: true, hareket_sil: false, hareket_duzenle: true,
+      uretim_ekle: false, uretim_sil: false,
+      hammadde_ekle: false, hammadde_sil: false,
+      virman_ekle: true, virman_sil: false,
+      ml_ekle: true, ml_sil: false,
+      engin_ekle: true, engin_sil: false,
+      kasa_ekle: true, kasa_sil: false,
+      satis_ekle: false, satis_sil: false,
+      kullanici_yonet: false,
+      db_sifirla: false,
+      yedek_al: true,
+      veri_yukle: false,
+      disa_aktar: true,
+    }
+  },
+  depo: {
+    ad: 'Depo / Üretim',
+    renk: 'bG',
+    ekranlar: ['ozet','uretim','hammadde','urun_stok','maliyet'],
+    islemler: {
+      cari_ekle: false, cari_sil: false, cari_duzenle: false,
+      hareket_ekle: false, hareket_sil: false, hareket_duzenle: false,
+      uretim_ekle: true, uretim_sil: false,
+      hammadde_ekle: true, hammadde_sil: false,
+      virman_ekle: false, virman_sil: false,
+      ml_ekle: false, ml_sil: false,
+      engin_ekle: false, engin_sil: false,
+      kasa_ekle: false, kasa_sil: false,
+      satis_ekle: false, satis_sil: false,
+      kullanici_yonet: false,
+      db_sifirla: false,
+      yedek_al: false,
+      veri_yukle: false,
+      disa_aktar: false,
+    }
+  },
+  satis: {
+    ad: 'Satış',
+    renk: 'bP',
+    ekranlar: ['ozet','satis','cariler','cari_detail','rapor'],
+    islemler: {
+      cari_ekle: false, cari_sil: false, cari_duzenle: false,
+      hareket_ekle: true, hareket_sil: false, hareket_duzenle: false,
+      uretim_ekle: false, uretim_sil: false,
+      hammadde_ekle: false, hammadde_sil: false,
+      virman_ekle: false, virman_sil: false,
+      ml_ekle: false, ml_sil: false,
+      engin_ekle: false, engin_sil: false,
+      kasa_ekle: false, kasa_sil: false,
+      satis_ekle: true, satis_sil: false,
+      kullanici_yonet: false,
+      db_sifirla: false,
+      yedek_al: false,
+      veri_yukle: false,
+      disa_aktar: true,
+    }
+  },
+  goruntule: {
+    ad: 'Sadece Görüntüle',
+    renk: 'bX',
+    ekranlar: ['ozet','satis','cariler','cari_detail','rapor'],
+    islemler: {
+      cari_ekle: false, cari_sil: false, cari_duzenle: false,
+      hareket_ekle: false, hareket_sil: false, hareket_duzenle: false,
+      uretim_ekle: false, uretim_sil: false,
+      hammadde_ekle: false, hammadde_sil: false,
+      virman_ekle: false, virman_sil: false,
+      ml_ekle: false, ml_sil: false,
+      engin_ekle: false, engin_sil: false,
+      kasa_ekle: false, kasa_sil: false,
+      satis_ekle: false, satis_sil: false,
+      kullanici_yonet: false,
+      db_sifirla: false,
+      yedek_al: false,
+      veri_yukle: false,
+      disa_aktar: false,
+    }
+  }
+};
 
 let currentUser = null;
 
@@ -672,8 +816,11 @@ function loginYap() {
   const appEl = document.getElementById('app');
   appEl.style.display = 'flex';
 
-  // Kullanıcı label
-  document.getElementById('sb-user-label').textContent = user.name;
+  // Kullanıcı label ve rol
+  document.getElementById('sb-user-label').textContent = user.name + ' — ' + (ROL_TANIMLARI[user.role]?.ad || user.role);
+
+  // Yetki bazlı sidebar güncelle
+  yetkiSidebarGuncelle();
 
   // Uygulamayı başlat
   appInit();
@@ -722,12 +869,57 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Yetki kontrolü
-function canEdit() {
-  return currentUser && (currentUser.role === 'admin' || currentUser.role === 'finans');
-}
+// ── Yetki Sistemi ──
 function isAdmin() {
-  return currentUser && currentUser.role === 'admin';
+  return currentUser?.role === 'admin';
+}
+
+function getUserPerms() {
+  if (!currentUser) return {};
+  // Özel yetkiler varsa onları kullan, yoksa rol tanımını
+  if (currentUser.ozelYetkiler) return currentUser.ozelYetkiler;
+  return ROL_TANIMLARI[currentUser.role]?.islemler || {};
+}
+
+function canDo(islem) {
+  if (!currentUser) return false;
+  if (isAdmin()) return true;
+  const perms = getUserPerms();
+  return perms[islem] === true;
+}
+
+function canSeeScreen(ekran) {
+  if (!currentUser) return false;
+  if (isAdmin()) return true;
+  const rol = ROL_TANIMLARI[currentUser.role];
+  if (!rol) return false;
+  // Özel ekran listesi varsa onu kullan
+  const ekranlar = currentUser.ozelEkranlar || rol.ekranlar;
+  return ekranlar.includes(ekran);
+}
+
+// Eski canEdit fonksiyonu — geriye uyumluluk
+function canEdit() {
+  return canDo('hareket_ekle');
+}
+
+function yetkiYok(mesaj) {
+  toast('⛔ ' + (mesaj || 'Bu işlem için yetkiniz yok.'), 'err');
+}
+
+// Yetki kontrolü ile sidebar güncellemesi
+function yetkiSidebarGuncelle() {
+  if (!currentUser) return;
+  document.querySelectorAll('.ni[data-ekran]').forEach(el => {
+    const ekran = el.getAttribute('data-ekran');
+    if (ekran) el.style.display = canSeeScreen(ekran) ? '' : 'none';
+  });
+  // Admin olmayanlara sıfırlama butonlarını gizle
+  if (!isAdmin()) {
+    document.body.classList.add('sadece-goruntule');
+  } else {
+    document.body.classList.remove('sadece-goruntule');
+  }
 }
 
 /* ════════════════════════════════════
@@ -2148,7 +2340,7 @@ function ciKaydet() {
 }
 
 function cariHarSil(key, id) {
-  if (!isAdmin()) { yetkiYok(); return; }
+  if (!canDo('hareket_sil')) { yetkiYok('Hareket silme yetkiniz yok'); return; }
   konfirm('Hareketi Sil', 'Bu hareketi silmek istediğinize emin misiniz? Bakiye otomatik güncellenecektir.', () => {
     const c = DB.cariler[key];
     c.hareketler = c.hareketler.filter(h => h.id !== id);
@@ -2568,6 +2760,39 @@ function virmanKonuDeg() {
   virmanGuncelle();
 }
 
+/* ── UYGULAMA BAŞLATMA ── */
+function appInit() {
+  dbYukle();
+  cariNavGuncelle();
+  const pdateEl = document.getElementById('pdate');
+  if (pdateEl) pdateEl.textContent = new Date().toLocaleDateString('tr-TR', {
+    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+  });
+  const lastPage = sessionStorage.getItem('mlk_last_page') || 'ozet';
+  go(lastPage);
+}
+
+window.addEventListener('beforeunload', () => {
+  sessionStorage.setItem('mlk_last_page', AP);
+});
+
+// ── Mobil Sidebar Toggle ──
+function sbToggle() {
+  const sb = document.getElementById('sb');
+  const ov = document.getElementById('sb-overlay');
+  if (sb.classList.contains('acik')) sbKapat(); else sbAc();
+}
+function sbAc() {
+  document.getElementById('sb')?.classList.add('acik');
+  document.getElementById('sb-overlay')?.classList.add('acik');
+  document.body.style.overflow = 'hidden';
+}
+function sbKapat() {
+  document.getElementById('sb')?.classList.remove('acik');
+  document.getElementById('sb-overlay')?.classList.remove('acik');
+  document.body.style.overflow = '';
+}
+
 function tumBakiyeleriYenidenHesapla() {
   Object.values(DB.cariler).forEach(c => {
     c.hareketler = _bakiyeHesapla(c.hareketler);
@@ -2661,7 +2886,7 @@ function virmanGuncelle() {
 }
 
 function virmanYap() {
-  if (!isAdmin()) { yetkiYok(); return; }
+  if (!canDo('virman_ekle')) { yetkiYok('Virman ekleme yetkiniz yok'); return; }
   const kaynakKey = fVal('vir-kaynak');
   const hedefKey  = fVal('vir-hedef');
   const tarih     = fVal('vir-tarih');
@@ -4044,7 +4269,7 @@ function hmalHspl2() {
 }
 
 function hmalKaydet() {
-  if (!isAdmin()) { yetkiYok(); return; }
+  if (!canDo('hammadde_ekle')) { yetkiYok('Hammadde ekleme yetkiniz yok'); return; }
   const k = fVal('hmal-k'); const m = fNum('hmal-mik');
   if (!m) { toast('Miktar giriniz!', 'err'); return; }
   const t = fNum('hmal-tutar');
@@ -4798,7 +5023,7 @@ function uyBidonOzetGoster() {
 }
 
 function uyKaydet() {
-  if (!isAdmin()) { yetkiYok(); return; }
+  if (!canDo('uretim_ekle')) { yetkiYok('Üretim ekleme yetkiniz yok'); return; }
   const tarih = fVal('uy-tarih'); const lot = fVal('uy-lot'); const urun = fVal('uy-urun').trim();
   if (!urun) { toast('Ürün adı giriniz!', 'err'); return; }
   if (!lot)  { toast('Lot no giriniz!', 'err'); return; }
@@ -5770,6 +5995,9 @@ let AP = 'ozet';
 
 /* ── NAVİGASYON ── */
 function go(panel, el) {
+  // Mobilde menüyü kapat
+  if (window.innerWidth <= 768) sbKapat();
+
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x => x.classList.remove('active'));
 
@@ -5949,729 +6177,78 @@ function raporYazdir() {
 
 function rAyarlar() {
   const p = pg('ayarlar');
-  p.innerHTML = `
-    <div class="twoC">
-      <!-- KULLANICI YÖNETİMİ -->
-      <div class="settings-card">
-        <h3>👤 Kullanıcılar</h3>
-        ${USERS.map(u => `
-          <div class="user-row">
-            <div>
-              <div style="font-weight:600;font-size:12.5px">${u.name}</div>
-              <div style="font-size:11px;color:var(--tx2)">@${u.username} · ${u.role}</div>
-            </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <span class="badge ${u.role==='admin'?'bR':u.role==='finans'?'bB':'bX'}">${u.role}</span>
-              ${isAdmin() ? `<button class="btn xs te" onclick="kullaniciSifreDegistir('${u.username}')">🔑</button>` : ''}
-            </div>
-          </div>`).join('')}
-        ${isAdmin() ? `<div style="margin-top:12px"><button class="btn gn sm" onclick="yeniKullaniciAc()">+ Yeni Kullanıcı</button></div>` : ''}
-      </div>
-
-      <!-- VERİ YÖNETİMİ -->
-      <div class="settings-card">
-        <h3>💾 Veri Yönetimi</h3>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn gn" onclick="exportJSON()" style="justify-content:flex-start">
-            📥 Yerel Yedek Al (JSON)
-          </button>
-          <button class="btn te" onclick="importJSON()" style="justify-content:flex-start">
-            📤 Yerel Yedekten Geri Yükle
-          </button>
-          <button class="btn am" onclick="cloudYukle()" style="justify-content:flex-start">
-            ☁️ Bulut Yedekten Geri Yükle
-          </button>
-          <hr class="divider">
-          ${isAdmin() ? `
-          <button class="btn dn" onclick="verileriSifirla()" style="justify-content:flex-start">
-            ⚠️ Tüm Verileri Sıfırla (Fabrika Ayarı)
-          </button>` : ''}
-        </div>
-      </div>
-
-      <!-- HAMMADDE YÖNETİMİ -->
-      <div class="settings-card">
-        <h3>🧪 Hammadde Yönetimi</h3>
-        <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">Sisteme kayıtlı hammaddeler:</div>
-        ${Object.entries(DB.hammadde).map(([k, h]) => `
-          <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bdr)">
-            <div style="width:10px;height:10px;border-radius:50%;background:${h.renk};flex-shrink:0"></div>
-            <span style="flex:1;font-size:12px;font-weight:500">${h.ad}</span>
-            <span style="font-size:11px;color:var(--tx2)">${h.guncel} ${h.birim}</span>
-          </div>`).join('')}
-      </div>
-
-      <!-- BULUT SYNC -->
-      <div class="settings-card">
-        <h3>☁️ Bulut Senkronizasyon</h3>
-        <div class="finfo" style="margin-bottom:10px">
-          Veriler otomatik olarak yerel depoya kaydedilir.
-          Manuel bulut yedekleme için aşağıdaki butonu kullanın.
-        </div>
-        <button class="btn pr" onclick="manuelCloudSync()" style="width:100%">
-          ☁️ Şimdi Buluta Yedekle
-        </button>
-        <div style="margin-top:8px;font-size:11px;color:var(--tx2)" id="cloud-last-sync">
-          ${getCloudLastSync()}
-        </div>
-      </div>
-
-      <!-- UYGULAMA BİLGİSİ -->
-      <div class="settings-card">
-        <h3>ℹ️ Uygulama Bilgisi</h3>
-        <div style="font-size:12px;line-height:2;color:var(--tx2)">
-          <div><b style="color:var(--tx)">Versiyon:</b> 4.0</div>
-          <div><b style="color:var(--tx)">Firma:</b> Marmara Lider Kimya</div>
-          <div><b style="color:var(--tx)">Cari Sayısı:</b> ${Object.keys(DB.cariler).length}</div>
-          <div><b style="color:var(--tx)">Satış Kayıtları:</b> ${DB.satislar.length}</div>
-          <div><b style="color:var(--tx)">Hareket Kayıtları:</b> ${DB.marmaraLift.length + DB.enginHarcama.length + DB.enginTahsilat.length}</div>
-          <div><b style="color:var(--tx)">Üretim Kayıtları:</b> ${DB.uretimKayitlari.length}</div>
-          <div><b style="color:var(--tx)">Reçete Sayısı:</b> ${DB.receteler.length}</div>
-          <div><b style="color:var(--tx)">Giriş Yapan:</b> ${currentUser ? currentUser.name + ' (' + currentUser.role + ')' : '—'}</div>
-        </div>
-      </div>
-    </div>`;
-}
-
-function getCloudLastSync() {
-  try {
-    const raw = localStorage.getItem('mlk_v4_cloud');
-    if (!raw) return 'Henüz buluta yedeklenmedi';
-    const cloud = JSON.parse(raw);
-    return 'Son bulut yedeği: ' + new Date(cloud.syncTime).toLocaleString('tr-TR');
-  } catch { return 'Bulut yedek bilgisi yok'; }
-}
-
-function manuelCloudSync() {
-  cloudSync();
-  toast('✅ Buluta yedeklendi', 'ok');
-  rAyarlar();
-}
-
-function verileriSifirla() {
-  konfirm('⚠️ VERİLERİ SIFIRLA', 'TÜM veriler silinip fabrika ayarlarına dönülecek! Bu işlem GERİ ALINAMAZ. Emin misiniz?', () => {
-    localStorage.removeItem('mlk_v4');
-    DB = JSON.parse(JSON.stringify(DEF_DB));
-    dbKaydet();
-    render();
-    toast('⚠️ Veriler sıfırlandı', 'err');
-  }, '⚠️ Evet, Sıfırla', 'btn dn');
-}
-
-/* ── KULLANICI İŞLEMLERİ ── */
-function kullaniciSifreDegistir(username) {
-  const user = USERS.find(u => u.username === username);
-  if (!user) return;
-  const body = `
-    <div class="finfo"><b>${user.name}</b> (@${user.username}) kullanıcısının şifresi değiştiriliyor.</div>
-    <div class="fr"><label>Yeni Şifre <span class="req">*</span></label>
-      <input id="ksd-sifre" type="password" placeholder="Yeni şifre..." autocomplete="new-password">
-    </div>
-    <div class="fr"><label>Şifre Tekrar</label>
-      <input id="ksd-sifre2" type="password" placeholder="Şifreyi tekrar girin..." autocomplete="new-password">
-    </div>`;
-  modalOlustur('mo-ksd', 'Şifre Değiştir', body,
-    `<button class="btn" onclick="mKapat('mo-ksd')">İptal</button>
-     <button class="btn pr" onclick="kullaniciSifreKaydet('${username}')">🔑 Değiştir</button>`, 'sm');
-  mAc('mo-ksd');
-}
-
-function kullaniciSifreKaydet(username) {
-  const s1 = fVal('ksd-sifre'); const s2 = fVal('ksd-sifre2');
-  if (!s1) { toast('Şifre boş olamaz!', 'err'); return; }
-  if (s1 !== s2) { toast('Şifreler eşleşmiyor!', 'err'); return; }
-  if (s1.length < 5) { toast('Şifre en az 5 karakter olmalı!', 'err'); return; }
-  const user = USERS.find(u => u.username === username);
-  if (user) user.password = s1;
-  mKapat('mo-ksd');
-  toast('✅ Şifre değiştirildi', 'ok');
-}
-
-function yeniKullaniciAc() {
-  const body = `
-    <div class="fg2">
-      <div class="fr"><label>Ad Soyad <span class="req">*</span></label><input id="nk-ad" type="text"></div>
-      <div class="fr"><label>Kullanıcı Adı <span class="req">*</span></label><input id="nk-user" type="text"></div>
-    </div>
-    <div class="fg2">
-      <div class="fr"><label>Şifre <span class="req">*</span></label><input id="nk-sifre" type="password"></div>
-      <div class="fr"><label>Yetki</label>
-        <select id="nk-role">
-          <option value="finans">Finans</option>
-          <option value="cari">Cari Görüntüleme</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-    </div>`;
-  modalOlustur('mo-nk', 'Yeni Kullanıcı', body,
-    `<button class="btn" onclick="mKapat('mo-nk')">İptal</button>
-     <button class="btn pr" onclick="yeniKullaniciKaydet()">💾 Ekle</button>`, 'sm');
-  mAc('mo-nk');
-}
-
-function yeniKullaniciKaydet() {
-  const ad = fVal('nk-ad').trim(); const un = fVal('nk-user').trim(); const s = fVal('nk-sifre');
-  if (!ad || !un || !s) { toast('Tüm alanlar zorunludur!', 'err'); return; }
-  if (USERS.find(u => u.username === un)) { toast('Bu kullanıcı adı zaten var!', 'err'); return; }
-  USERS.push({ id: Date.now(), username: un, password: s, name: ad, role: fVal('nk-role') });
-  mKapat('mo-nk');
-  rAyarlar();
-  toast('✅ Kullanıcı eklendi', 'ok');
-}
-
-/* ── UYGULAMA BAŞLATMA ── */
-
-// ── EXCEL İMPORT SİSTEMİ ──
-const EXCEL_DATA = {"cari_hareketler": {"H2O": [{"tarih": "2026-03-28", "birimF": 2250.0, "tutar": 67500.0, "gelen": 0, "adet": 30.0}, {"tarih": "2026-03-31", "birimF": 2250.0, "tutar": 67500.0, "gelen": 0, "adet": 30.0}, {"tarih": "2026-04-05", "birimF": 2250.0, "tutar": 0.0, "gelen": 2250.0, "adet": -1.0}, {"tarih": "2026-04-05", "birimF": 2250.0, "tutar": 0.0, "gelen": 2250.0, "adet": -1.0}, {"tarih": "2026-04-16", "birimF": 2250.0, "tutar": 0.0, "gelen": 9000.0, "adet": -4.0}, {"tarih": "2026-05-04", "birimF": 0, "tutar": 0.0, "gelen": 22000.0, "adet": 0}, {"tarih": "2026-05-18", "birimF": 2250.0, "tutar": 94500.0, "gelen": 0, "adet": 42.0}, {"tarih": "2026-04-23", "birimF": 0, "tutar": 0.0, "gelen": 11160.0, "adet": 0}, {"tarih": "2026-05-25", "birimF": 0, "tutar": 0.0, "gelen": 34000.0, "adet": 0}, {"tarih": "2026-06-04", "birimF": 2250.0, "tutar": 31500.0, "gelen": 0, "adet": 14.0}, {"tarih": "2026-06-10", "birimF": 0, "tutar": 0.0, "gelen": 30000.0, "adet": 0}], "MURAT": [{"tarih": "2026-03-31", "birimF": 2000.0, "tutar": 16000.0, "gelen": 16000.0, "adet": 8.0}, {"tarih": "2026-05-04", "birimF": 2000.0, "tutar": 16000.0, "gelen": 0, "adet": 8.0}, {"tarih": "2026-05-13", "birimF": 0, "tutar": 0.0, "gelen": 16000.0, "adet": 0}, {"tarih": "2026-06-11", "birimF": 2000.0, "tutar": 16000.0, "gelen": 0, "adet": 8.0}, {"tarih": "2026-06-15", "birimF": 0, "tutar": 0.0, "gelen": 16000.0, "adet": 0}], "YASİN": [{"tarih": "2026-03-28", "birimF": 2450.0, "tutar": 19600.0, "gelen": 0.0, "adet": 8.0}, {"tarih": "2026-05-04", "birimF": 0, "tutar": 0.0, "gelen": 10000.0, "adet": 0}, {"tarih": "2026-05-05", "birimF": 0, "tutar": 0.0, "gelen": 9600.0, "adet": 0}, {"tarih": "2026-05-13", "birimF": 2450.0, "tutar": 19600.0, "gelen": 0, "adet": 8.0}, {"tarih": "2026-05-26", "birimF": 0, "tutar": 0.0, "gelen": 19600.0, "adet": 0}, {"tarih": "2026-06-10", "birimF": 2450.0, "tutar": 2450.0, "gelen": 0, "adet": 1.0}, {"tarih": "2026-06-15", "birimF": 2450.0, "tutar": 19600.0, "gelen": 0, "adet": 8.0}], "NUROL": [{"tarih": "2026-05-21", "birimF": 3000.0, "tutar": 12000.0, "gelen": 0, "adet": 4.0}, {"tarih": "2026-06-11", "birimF": 0, "tutar": 0.0, "gelen": 12000.0, "adet": 0}], "MAAN": [{"tarih": "2026-04-16", "birimF": 2500.0, "tutar": 10000.0, "gelen": 10000.0, "adet": 4.0}, {"tarih": "2026-05-21", "birimF": 2500.0, "tutar": 10000.0, "gelen": 0, "adet": 4.0}, {"tarih": "2026-05-21", "birimF": 0, "tutar": 0.0, "gelen": 10000.0, "adet": 0}, {"tarih": "2026-06-10", "birimF": 2500.0, "tutar": 12500.0, "gelen": 12500.0, "adet": 5.0}]}, "hammadde": [{"tarih": "2026-03-28", "ad": "H2O2", "giren": 4800.0, "cikan": 1200.0}, {"tarih": "2026-03-28", "ad": "BIGONIT", "giren": 100.0, "cikan": 30.0}, {"tarih": "2026-04-23", "ad": "H2O2", "giren": 6000.0, "cikan": 0}, {"tarih": "2026-04-24", "ad": "BIGONIT", "giren": 0, "cikan": 50.0}, {"tarih": "2026-04-24", "ad": "H2O2", "giren": 0, "cikan": 2400.0}], "satislar": [{"tarih": "2026-03-28", "firma": "H 2 O İZAL.TİC. A.Ş. ( OSMAN )", "fatNo": "", "birim": 2250.0, "tutar": 67500.0, "alinan": 22000.0, "adet": 30.0, "acik": "FABRİKA TESLİM"}, {"tarih": "2026-03-29", "firma": "YASİN KESİCİ MİLENYUM BUNGOLOV AĞVA", "fatNo": "", "birim": 2450.0, "tutar": 19600.0, "alinan": 19600.0, "adet": 8.0, "acik": "SATIŞ"}, {"tarih": "2026-03-31", "firma": "H 2 O İZAL.TİC. A.Ş. ( OSMAN )", "fatNo": "", "birim": 2250.0, "tutar": 67500.0, "alinan": 30000.0, "adet": 30.0, "acik": "FABRİKA TESLİM"}, {"tarih": "2026-03-31", "firma": "MURAT KABAKOZ AĞVA", "fatNo": "", "birim": 2000.0, "tutar": 16000.0, "alinan": 16000.0, "adet": 8.0, "acik": "SATIŞ"}, {"tarih": "2026-04-05", "firma": "H 2 O HERA BUNGOLOV BEDELSİ", "fatNo": "", "birim": 2250.0, "tutar": 0.0, "alinan": 2250.0, "adet": 0, "acik": "1 BEDELSİZ"}, {"tarih": "2026-04-05", "firma": "H 2 O ENGİN KOCAKUZU BEDELSİZ", "fatNo": "", "birim": 2250.0, "tutar": 0.0, "alinan": 2250.0, "adet": 0, "acik": "1 BEDELSİZ"}, {"tarih": "2026-04-16", "firma": "H 2 O MAAN SAPANCA İÇİN ALINAN", "fatNo": "", "birim": 2500.0, "tutar": 10000.0, "alinan": 10000.0, "adet": 0, "acik": "4 ADET H2O İADE ALINDI"}, {"tarih": "2026-05-04", "firma": "MURAT KABAKOZ AĞVA", "fatNo": "", "birim": 2000.0, "tutar": 16000.0, "alinan": 16000.0, "adet": 8.0, "acik": "SATIŞ"}, {"tarih": "2026-05-13", "firma": "YASİN KESİCİ MİLENYUM BUNGOLOV AĞVA", "fatNo": "", "birim": 2450.0, "tutar": 19600.0, "alinan": 19600.0, "adet": 8.0, "acik": "SATIŞ"}, {"tarih": "2026-05-13", "firma": "ÖZGÜR BEDELSİZ", "fatNo": "", "birim": 0.0, "tutar": 0.0, "alinan": 0.0, "adet": 1.0, "acik": "1 BEDELSİZ"}, {"tarih": "2026-05-18", "firma": "H 2 O MAAN SAPANCA İÇİN ALINAN", "fatNo": "", "birim": 2250.0, "tutar": 94500.0, "alinan": 0.0, "adet": 42.0, "acik": "FABRİKA TESLİM"}, {"tarih": "2026-05-18", "firma": "H 2 O MAAN SAPANCA İÇİN ALINAN", "fatNo": "", "birim": 0, "tutar": 0, "alinan": 11160.0, "adet": 0, "acik": "FAB.ÜRETİM BİDON"}, {"tarih": "2026-05-21", "firma": "MAAN SATIŞ", "fatNo": "", "birim": 2500.0, "tutar": 10000.0, "alinan": 10000.0, "adet": 4.0, "acik": "SATIŞ"}, {"tarih": "2026-05-21", "firma": "NUROL İNŞAAT", "fatNo": "", "birim": 3000.0, "tutar": 12000.0, "alinan": 12000.0, "adet": 4.0, "acik": "SATIŞ"}, {"tarih": "2026-05-25", "firma": "H 2 O İZAL.TİC. A.Ş. ( OSMAN )", "fatNo": "", "birim": 0, "tutar": 0, "alinan": 34000.0, "adet": 0, "acik": "YAKUP HESABA YATAN"}, {"tarih": "2026-06-04", "firma": "H 2 O İZAL.TİC. A.Ş. ( OSMAN )", "fatNo": "", "birim": 2250.0, "tutar": 31500.0, "alinan": 0.0, "adet": 14.0, "acik": "FABRİKA TESLİM"}, {"tarih": "2026-06-10", "firma": "MAAN SATIŞ", "fatNo": "", "birim": 2500.0, "tutar": 12500.0, "alinan": 12500.0, "adet": 5.0, "acik": "SATIŞ"}, {"tarih": "2026-06-11", "firma": "MURAT KABAKOZ AĞVA", "fatNo": "", "birim": 2000.0, "tutar": 16000.0, "alinan": 16000.0, "adet": 8.0, "acik": "SATIŞ"}, {"tarih": "2026-06-11", "firma": "YASİN KESİCİ MİLENYUM BUNGOLOV AĞVA", "fatNo": "", "birim": 2450.0, "tutar": 2450.0, "alinan": 0.0, "adet": 1.0, "acik": "SATIŞ"}, {"tarih": "2026-06-15", "firma": "YASİN KESİCİ MİLENYUM BUNGOLOV AĞVA", "fatNo": "", "birim": 2450.0, "tutar": 19600.0, "alinan": 0.0, "adet": 8.0, "acik": "SATIŞ"}], "ml_harc": [{"tarih": "2026-03-09", "ad": "KİRA-DEPOZITO-KOMİSYON", "tutar": 225000.0}, {"tarih": "2026-03-11", "ad": "İSTANBULDAN HAMMADDE VE  MAKİNALARIN NAKLİYESİ", "tutar": 7200.0}, {"tarih": "2026-03-11", "ad": "YİĞİTOĞLU HİDROJEN PEROKSİT ALIMI", "tutar": 125606.28000000001}, {"tarih": "2026-03-12", "ad": "KOMPRASÖR ALIMI (15 KW 20HP) VİDALI KOMPRASÖR", "tutar": 132000.0}, {"tarih": "2026-03-13", "ad": "YİĞİTOĞLUNDAN GELEN KİMYASAL İADE NAKLİYESİ", "tutar": 7200.0}, {"tarih": "2026-03-16", "ad": "SELGE KİMYA H2O2 ALIMI (4 IBC)", "tutar": 229991.01}, {"tarih": "2026-03-16", "ad": "AKKUR PLASTİK 368 BİDON ALIMI", "tutar": 57408.0}, {"tarih": "2026-03-17", "ad": "YİĞİTOĞLUNDAN GELEN KİMYASAL İADE", "tutar": -125265.19}, {"tarih": "2026-03-17", "ad": "FOSFORIK", "tutar": 3433.2750000000005}, {"tarih": "2026-03-18", "ad": "AZELİS KIMYA BIGONIT (VANTOCILTG) 4 BIDON", "tutar": 62425.0}, {"tarih": "2026-03-18", "ad": "OTOMASYON TAMİR İŞÇİLİK", "tutar": 2000.0}, {"tarih": "2026-03-19", "ad": "MASA SANDALYE ALIMI", "tutar": 18000.0}, {"tarih": "2026-04-06", "ad": "DOLUM MAKİNASI ALIMI  İÇİN ENGİNE ÖDENEN", "tutar": 350000.0}, {"tarih": "2026-04-06", "ad": "MARKA TESCİL 3 ADET", "tutar": 26370.0}, {"tarih": "2026-05-08", "ad": "SU ARITMA CİHAZI", "tutar": 88898.26}, {"tarih": "2026-05-15", "ad": "PROHES DANIŞMANLIK", "tutar": 30000.0}, {"tarih": "2026-06-04", "ad": "ELEKTİRİK FATURA CEZA ÖDEMESİ KOMŞU", "tutar": 7350.0}, {"tarih": "2026-06-16", "ad": "KİRA ÖDEMESİ", "tutar": 150000.0}], "ml_tah": [{"tarih": "2026-05-21", "ad": "YAKUP HESABA YATAN", "tutar": 5000.0}, {"tarih": "2026-05-21", "ad": "YAKUP ELDEN VERİLEN", "tutar": 5000.0}, {"tarih": "2026-05-25", "ad": "YAKUP HESABA YATAN", "tutar": 34000.0}, {"tarih": "2026-05-26", "ad": "YAKUP HESABA YATAN", "tutar": 8500.0}, {"tarih": "2026-06-15", "ad": "YAKUP HESABA YATAN", "tutar": 11000.0}], "kasa_gelir": [{"tarih": "2026-05-04", "ad": "H2O OSMAN", "tutar": 22000.0}, {"tarih": "2026-05-13", "ad": "ENGİN HESABA YATAN", "tutar": 16000.0}, {"tarih": "2026-05-21", "ad": "MAAN TAHSİLAT", "tutar": 10000.0}, {"tarih": "2026-05-25", "ad": "H2O OSMAN", "tutar": 34000.0}, {"tarih": "2026-05-26", "ad": "YASİN KESİCİ TAHSİLAT", "tutar": 8500.0}, {"tarih": "2026-06-10", "ad": "H2O OSMAN", "tutar": 30000.0}, {"tarih": "2026-06-11", "ad": "NUROL İNŞAAT HESABA YATAN", "tutar": 12000.0}, {"tarih": "2026-06-15", "ad": "MURAT KABAKOZ AĞVA", "tutar": 11000.0}], "kasa_gider": [{"tarih": "2026-05-15", "ad": "MEHTAP YILMAZ DANIŞMAN", "tutar": 30000.0}, {"tarih": "2026-05-21", "ad": "YAKUP HESABA YATAN", "tutar": 5000.0}, {"tarih": "2026-05-21", "ad": "YAKUP ELDEN VERİLEN", "tutar": 5000.0}, {"tarih": "2026-05-25", "ad": "YAKUP ELDEN VERİLEN", "tutar": 34000.0}, {"tarih": "2026-05-26", "ad": "YAKUP HESABA YATAN YASİN", "tutar": 8500.0}, {"tarih": "2026-06-04", "ad": "ELEKTİRİK FATURA CEZA ÖDEMESİ KOMŞU", "tutar": 7350.0}, {"tarih": "2026-06-15", "ad": "YAKUP HESABA YATAN", "tutar": 11000.0}], "engin_harc": [{"tarih": "2026-03-05", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-03-10", "ad": "İSTANBUL NAKL. FORTLİFT ÜCRETİ", "tutar": 3000.0}, {"tarih": "2026-03-11", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-03-18", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-03-28", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-03-31", "ad": "İSTANBUL SAKARYA MASRAF AĞVA-ŞİLE", "tutar": 5000.0}, {"tarih": "2026-04-16", "ad": "İSTANBUL SAKARYA MASRAF AĞVA-ŞİLE", "tutar": 5000.0}, {"tarih": "2026-04-24", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-05-04", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-05-12", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-05-21", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-06-04", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-06-10", "ad": "İSTANBUL SAKARYA MASRAF", "tutar": 5000.0}, {"tarih": "2026-06-11", "ad": "İSTANBUL SAKARYA MASRAF AĞVA-ŞİLE", "tutar": 2000.0}, {"tarih": "2026-06-15", "ad": "İSTANBUL SAKARYA AĞVA YOL MASRAFI", "tutar": 5000.0}], "engin_tah": [{"tarih": "2026-03-25", "ad": "GELEN HAVALE", "tutar": 10000.0}, {"tarih": "2026-03-31", "ad": "MURAT KABAKOZ AĞVA", "tutar": 16000.0}, {"tarih": "2026-04-16", "ad": "MAAN  SATIŞTAN TAHSİLAT", "tutar": 10000.0}, {"tarih": "2026-05-04", "ad": "YASİN KESİCİ TAHSİLAT", "tutar": 10000.0}, {"tarih": "2026-05-05", "ad": "YASİN KESİCİ TAHSİLAT", "tutar": 9600.0}, {"tarih": "2026-05-26", "ad": "YASİN KESİCİ TAHSİLAT", "tutar": 11100.0}, {"tarih": "2026-06-10", "ad": "MAAN SATIŞTAN TAHSİLAT", "tutar": 12500.0}, {"tarih": "2026-06-15", "ad": "YASİN KESİCİ TAHSİLAT", "tutar": 5000.0}]};
-
-function excelImportAc() {
-  // Cari eslestirme satirlarini string concat ile yap (template literal ic ice degil)
-  let cariRows = '';
-  Object.entries(DB.cariler).forEach(function([k,c]) {
-    let opts = '<option value="">— Atla —</option>';
-    Object.keys(EXCEL_DATA.cari_hareketler).forEach(function(ek) {
-      opts += '<option value="' + ek + '"' + (ek===k?' selected':'') + '>' + ek + '</option>';
-    });
-    cariRows += '<tr><td style="font-weight:600">' + c.ad + '</td><td><select id="ei-map-' + k + '">' + opts + '</select></td></tr>';
-  });
-
-  const topCari = Object.values(EXCEL_DATA.cari_hareketler).reduce((a,v)=>a+v.length,0);
-  const ozet = [
-    ['Cari Hareketler', topCari],
-    ['Satislar (2026)', EXCEL_DATA.satislar.length],
-    ['ML Harcamalari',  EXCEL_DATA.ml_harc.length],
-    ['ML Tahsilatlari', EXCEL_DATA.ml_tah.length],
-    ['Kasa Girisleri',  EXCEL_DATA.kasa_gelir.length],
-    ['Kasa Cikislari',  EXCEL_DATA.kasa_gider.length],
-    ['Engin Harcama',   EXCEL_DATA.engin_harc.length],
-    ['Engin Tahsilat',  EXCEL_DATA.engin_tah.length],
-    ['Hammadde',        EXCEL_DATA.hammadde.length],
-  ];
-  let ozetHTML = '';
-  ozet.forEach(function([k,v]) {
-    ozetHTML += '<div style="background:var(--surf2);padding:8px;border-radius:var(--ra)">'
-      + '<div style="font-size:10px;color:var(--tx2)">' + k + '</div>'
-      + '<div style="font-weight:700;color:var(--a)">' + v + ' kayit</div></div>';
-  });
-
-  const body = '<div class="fwarn" style="margin-bottom:12px">'
-    + '\u26a0\ufe0f Bu islem mevcut tum hareketleri <b>silerek</b> Excel verisiyle degistirir. '
-    + '<b>Yedek almayi unutmayin!</b></div>'
-    + '<div class="form-section"><div class="form-section-title">\ud83d\uddc2\ufe0f Cari Eslestirme</div>'
-    + '<div class="tw"><table><thead><tr><th>Programdaki Cari</th><th>Excel Sayfasi</th></tr></thead>'
-    + '<tbody>' + cariRows + '</tbody></table></div></div>'
-    + '<div class="form-section"><div class="form-section-title">\ud83d\udce6 Yuklenecek Veriler</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px">' + ozetHTML + '</div></div>';
-
-  modalOlustur('mo-ei', '\ud83d\udcca Excel\'den Veri Yukle', body,
-    '<button class="btn" onclick="mKapat(\'mo-ei\')">Iptal</button>'
-    + ' <button class="btn dn" onclick="excelImportYap()">\u26a0\ufe0f Hareketleri Sil ve Yeniden Yukle</button>',
-    'lg');
-  mAc('mo-ei');
-}
-
-function excelImportYap() {
-  if (!confirm('Tum mevcut hareketler silinip Excel verisi yuklenecek. Emin misiniz?')) return;
-
-  const cariMap = {};
-  Object.keys(DB.cariler).forEach(function(k) {
-    const el = document.getElementById('ei-map-' + k);
-    if (el && el.value) cariMap[k] = el.value;
-  });
-
-  let _xid = Date.now();
-  function uid() { return 'xi' + (_xid++); }
-
-  // Cari hareketleri
-  Object.entries(cariMap).forEach(function([cariKey, excelKey]) {
-    const rows = EXCEL_DATA.cari_hareketler[excelKey] || [];
-    const hareketler = [];
-    rows.forEach(function(r) {
-      if (r.tutar > 0 && r.adet > 0) {
-        hareketler.push({
-          id: uid(), tarih: r.tarih, tur: 'satis',
-          fatno: '', adet: r.adet, birim: r.birimF,
-          tutar: r.tutar, tahsilat: r.gelen || 0, bakiye: 0,
-          acik: 'Excelden aktarildi'
-        });
-      } else if (r.gelen > 0 && r.tutar === 0 && r.adet <= 0) {
-        hareketler.push({
-          id: uid(), tarih: r.tarih, tur: 'tahsilat',
-          fatno: '', adet: 0, birim: 0,
-          tutar: 0, tahsilat: r.gelen, bakiye: 0,
-          acik: 'Excelden aktarildi'
-        });
-      } else if (r.tutar > 0 && r.adet <= 0) {
-        hareketler.push({
-          id: uid(), tarih: r.tarih, tur: 'diger',
-          fatno: '', adet: 0, birim: 0,
-          tutar: r.tutar, tahsilat: r.gelen || 0, bakiye: 0,
-          acik: 'Excelden aktarildi'
-        });
-      }
-    });
-    DB.cariler[cariKey].hareketler = _bakiyeHesapla(hareketler);
-  });
-
-  // 2026 Satislar
-  DB.satislar = EXCEL_DATA.satislar.map(function(s) {
-    return {
-      id: uid(), tarih: s.tarih, firma: s.firma, tur: 'satis',
-      fatNo: s.fatNo, birim: s.birim, tutar: s.tutar,
-      alinan: s.alinan, adet: s.adet, not: s.acik
-    };
-  });
-
-  // ML
-  DB.marmaraLift = [];
-  EXCEL_DATA.ml_harc.forEach(function(x) {
-    DB.marmaraLift.push({ id: uid(), tarih: x.tarih, tip: 'gider', ad: x.ad, tutar: x.tutar, kat: 'HAMMADDE', not: 'Excelden aktarildi' });
-  });
-  EXCEL_DATA.ml_tah.forEach(function(x) {
-    DB.marmaraLift.push({ id: uid(), tarih: x.tarih, tip: 'gelir', ad: x.ad, tutar: x.tutar, kat: 'TAHSILAT', not: 'Excelden aktarildi' });
-  });
-
-  // Kasa
-  DB.kasa.gelir = EXCEL_DATA.kasa_gelir.map(function(x) {
-    return { id: uid(), tarih: x.tarih, ad: x.ad, tutar: x.tutar, not: 'Excelden aktarildi' };
-  });
-  DB.kasa.gider = EXCEL_DATA.kasa_gider.map(function(x) {
-    return { id: uid(), tarih: x.tarih, ad: x.ad, tutar: x.tutar, not: 'Excelden aktarildi' };
-  });
-
-  // Engin
-  DB.enginHarcama = EXCEL_DATA.engin_harc.map(function(x) {
-    return { id: uid(), tarih: x.tarih, ad: x.ad, tutar: x.tutar, kat: 'MASRAF', not: 'Excelden aktarildi' };
-  });
-  DB.enginTahsilat = EXCEL_DATA.engin_tah.map(function(x) {
-    return { id: uid(), tarih: x.tarih, kimden: x.ad, tutar: x.tutar, acik: 'Excelden aktarildi' };
-  });
-
-  mKapat('mo-ei');
-  dbKaydet();
-  cariNavGuncelle();
-  go(AP);
-  toast('Excel verileri yuklendi!', 'ok');
-}
-
-
-// Herhangi bir kaydet/sil işleminden sonra aktif sayfayı güncelle
-function sonGuncelle(extraFn) {
-  if (extraFn) extraFn();
-  if (AP === 'htum') rHT();
-}
-
-// ── Supabase Konfigürasyonu ──
-const SUPA_URL = 'https://gzoeewfoetmbdkwcgoqn.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6b2Vld2ZvZXRtYmRrd2Nnb3FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwODAxNTEsImV4cCI6MjA5NzY1NjE1MX0.gP_pUJah_vlyranYbD-ozUNAqiIsrNuu3KwAbAV6sy4';
-const SUPA_HEADERS = { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY };
-
-async function supaKaydet() {
-  try {
-    const res = await fetch(SUPA_URL + '/rest/v1/mlk_data', {
-      method: 'POST',
-      headers: { ...SUPA_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ id: 'main', data: DB, updated_at: new Date().toISOString() })
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const badge = document.getElementById('cloud-badge');
-    if (badge) {
-      badge.className = 'cloud-badge ok';
-      badge.textContent = '☁️ ' + new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'});
-      setTimeout(() => { if (badge) { badge.className = 'cloud-badge'; badge.textContent = '☁️ Bulut'; } }, 4000);
-    }
-    return true;
-  } catch(e) {
-    console.error('Supabase kayıt hatası:', e);
-    const badge = document.getElementById('cloud-badge');
-    if (badge) { badge.className = 'cloud-badge err'; badge.textContent = '☁️ Hata'; }
-    return false;
-  }
-}
-
-async function supaYukle() {
-  try {
-    const res = await fetch(SUPA_URL + '/rest/v1/mlk_data?id=eq.main&select=data,updated_at', {
-      headers: SUPA_HEADERS
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const rows = await res.json();
-    if (rows && rows.length > 0 && rows[0].data && Object.keys(rows[0].data).length > 0) {
-      return rows[0];
-    }
-    return null;
-  } catch(e) {
-    console.error('Supabase yükleme hatası:', e);
-    return null;
-  }
-}
-
-
-const _sortState = {}; // { tableId: { col, dir } }
-
-function thSortable(tableId, col, label) {
-  const st = _sortState[tableId] || {};
-  const aktif = st.col === col;
-  const ikon = aktif ? (st.dir === 'asc' ? ' ↑' : ' ↓') : '';
-  return `<th style="cursor:pointer;user-select:none;white-space:nowrap" onclick="tableSort('${tableId}','${col}')">${label}${ikon}</th>`;
-}
-
-function tableSort(tableId, col) {
-  const st = _sortState[tableId] || { col: null, dir: 'asc' };
-  if (st.col === col) {
-    st.dir = st.dir === 'asc' ? 'desc' : 'asc';
-  } else {
-    st.col = col; st.dir = 'asc';
-  }
-  _sortState[tableId] = st;
-
-  const table = document.getElementById(tableId);
-  if (!table) return;
-  const tbody = table.querySelector('tbody');
-  if (!tbody) return;
-
-  const rows = Array.from(tbody.querySelectorAll('tr'));
-  const colIdx = parseInt(col);
-
-  rows.sort((a, b) => {
-    const aEl = a.cells[colIdx];
-    const bEl = b.cells[colIdx];
-    if (!aEl || !bEl) return 0;
-    let aV = aEl.textContent.trim().replace(/[₺,\.]/g,'').replace(',','.');
-    let bV = bEl.textContent.trim().replace(/[₺,\.]/g,'').replace(',','.');
-    // Tarih mi?
-    if (/^\d{2}\.\d{2}\.\d{4}$/.test(aEl.textContent.trim())) {
-      aV = aEl.textContent.trim().split('.').reverse().join('');
-      bV = bEl.textContent.trim().split('.').reverse().join('');
-    }
-    const aNum = parseFloat(aV.replace(/\./g,'').replace(',','.'));
-    const bNum = parseFloat(bV.replace(/\./g,'').replace(',','.'));
-    let cmp = 0;
-    if (!isNaN(aNum) && !isNaN(bNum)) cmp = aNum - bNum;
-    else cmp = aV.localeCompare(bV, 'tr');
-    return st.dir === 'asc' ? cmp : -cmp;
-  });
-
-  // th ikonlarını güncelle
-  const ths = table.querySelectorAll('th[onclick]');
-  ths.forEach(th => {
-    const m = th.getAttribute('onclick')?.match(/'(\d+)'\)$/);
-    if (!m) return;
-    const c = m[1];
-    const base = th.textContent.replace(/ [↑↓]$/, '');
-    th.textContent = base + (c === col ? (st.dir === 'asc' ? ' ↑' : ' ↓') : '');
-  });
-
-  rows.forEach(r => tbody.appendChild(r));
-}
-
-function thClick(tableId, colIdx, label) {
-  const st = _sortState[tableId] || {};
-  const aktif = st.col === String(colIdx);
-  const ikon = aktif ? (st.dir === 'asc' ? ' ↑' : ' ↓') : ' ⇅';
-  return `<th style="cursor:pointer;user-select:none;white-space:nowrap" onclick="tableSort('${tableId}','${colIdx}')">${label}<span style="opacity:.5;font-size:10px">${ikon}</span></th>`;
-}
-
-function isAdmin() {
-  return currentUser && currentUser.role === 'admin';
-}
-// Yetkisiz kullanıcıya uyarı
-function yetkiYok() {
-  toast('⛔ Bu işlem için yetkiniz yok. Sadece yönetici değişiklik yapabilir.', 'err');
-}
-
-function appInit() {
-  dbYukle();
-  cariNavGuncelle();
-  document.getElementById('pdate').textContent = new Date().toLocaleDateString('tr-TR', {
-    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
-  });
-
-  // Sayı inputlarında başındaki "0" kalsın sorununu çöz:
-  // Focus olunca tümü seç → yazmaya başlayınca silinir
-  document.addEventListener('focusin', e => {
-    if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
-      e.target.select();
-    }
-  });
-  // mouseup sonrası da select (Chrome'da focusin bazen select'i eziyor)
-  document.addEventListener('mouseup', e => {
-    if (e.target.tagName === 'INPUT' && e.target.type === 'number' &&
-        document.activeElement === e.target) {
-      e.target.select();
-    }
-  });
-
-  // Rol bazlı arayüz
   if (!isAdmin()) {
-    document.body.classList.add('sadece-goruntule');
-  } else {
-    document.body.classList.remove('sadece-goruntule');
+    p.innerHTML = `<div class="fwarn">⛔ Bu sayfaya erişim yetkiniz yok.</div>`;
+    return;
   }
 
-  // Önceki sayfayı restore et
-  const lastPage = sessionStorage.getItem('mlk_last_page') || 'ozet';
-  go(lastPage);
-}
-
-// Sayfa değişince session'a kaydet
-const _origGo = go;
-window.addEventListener('beforeunload', () => {
-  sessionStorage.setItem('mlk_last_page', AP);
-});
-
-// Session kontrolü zaten auth.js'de yapılıyor ama appInit çağrısı burada
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = sessionStorage.getItem('mlk_user');
-  if (saved) {
-    try {
-      currentUser = JSON.parse(saved);
-      document.getElementById('login-screen').style.display = 'none';
-      const appEl = document.getElementById('app');
-      appEl.style.display = 'flex';
-      document.getElementById('sb-user-label').textContent = currentUser.name;
-      appInit();
-    } catch(e) {
-      sessionStorage.removeItem('mlk_user');
-    }
-  }
-});
-
-
-
-/* ════════════════════════════════════
-   ANA KASA — Şirket Genel Tablosu
-   ════════════════════════════════════ */
-function rAnaKasa() {
-  const p = pg('ana_kasa');
-
-  // Tüm GELİR kaynakları
-  const satisGelir    = DB.satislar.filter(s=>s.tur==='satis').reduce((a,s)=>a+(s.alinan||0),0);
-  const kasaGelir     = DB.kasa.gelir.reduce((a,x)=>a+(x.tutar||0),0);
-  const enginTahsilat = DB.enginTahsilat.reduce((a,x)=>a+(x.tutar||0),0);
-  const mlIade        = DB.marmaraLift.filter(x=>x.tip==='gelir').reduce((a,x)=>a+(x.tutar||0),0);
-  const sermayeGelen  = (DB.sermaye?.odemeler||[]).filter(x=>x.durum==='odendi').reduce((a,x)=>a+(x.tutar||0),0);
-  const toplamGelir   = satisGelir + kasaGelir + enginTahsilat + mlIade + sermayeGelen;
-
-  // Tüm GİDER kaynakları
-  const mlGider    = DB.marmaraLift.filter(x=>x.tip==='gider').reduce((a,x)=>a+(x.tutar||0),0);
-  const enginHarc  = DB.enginHarcama.reduce((a,x)=>a+(x.tutar||0),0);
-  const kasaGider  = DB.kasa.gider.reduce((a,x)=>a+(x.tutar||0),0);
-  const toplamGider= mlGider + enginHarc + kasaGider;
-
-  // Net
-  const netBakiye  = toplamGelir - toplamGider;
-
-  // Açık satış alacakları
-  const satisAlacak= DB.satislar.filter(s=>s.tur==='satis').reduce((a,s)=>a+Math.max(0,(s.tutar||0)-(s.alinan||0)),0);
-  const cariAlacak = Object.keys(DB.cariler).reduce((a,k)=>a+Math.max(0,cariSonBakiye(k)),0);
-
-  // Bekleyen sermaye
-  const sermayeBekleyen = (DB.sermaye?.odemeler||[]).filter(x=>x.durum==='bekliyor').reduce((a,x)=>a+(x.tutar||0),0);
+  const kullaniciSatirlari = USERS.map(u => {
+    const rolTanim = ROL_TANIMLARI[u.role] || {};
+    return `<tr>
+      <td style="font-weight:600">${u.name}</td>
+      <td style="color:var(--tx2);font-size:11px">@${u.username}</td>
+      <td>${badge(rolTanim.ad || u.role, rolTanim.renk || 'bX')}</td>
+      <td>${u.aktif !== false ? badge('Aktif','bG') : badge('Pasif','bR')}</td>
+      <td><div class="td-actions">
+        ${u.username !== 'yakup' ? `
+          <button class="btn xs te" onclick="kullaniciDuzenle(${u.id})" title="Düzenle">✏️</button>
+          <button class="btn xs" onclick="kullaniciSifreDegistir('${u.username}')" title="Şifre">🔑</button>
+          <button class="btn xs dn" onclick="kullaniciSil(${u.id})" title="Sil">🗑</button>
+        ` : '<span style="font-size:10px;color:var(--tx2)">Ana Yönetici</span>'}
+      </div></td>
+    </tr>`;
+  }).join('');
 
   p.innerHTML = `
-    <div class="finfo" style="margin-bottom:16px">
-      📌 <b>Ana Kasa</b>, şirketin tüm para hareketlerinin birleşik görünümüdür.
-      Operasyonel kasa, ML harcamaları, Engin hesabı ve sermaye ödemeleri burada özetlenir.
-      <b>Sermaye ödemeleri kasayı etkilemez</b> — ayrı izlenir.
-    </div>
-    <div class="sg">
-      ${statCard('Toplam Gelir', '₺'+fmt(toplamGelir), 'Tüm kaynaklar', 'G')}
-      ${statCard('Toplam Gider', '₺'+fmt(toplamGider), 'ML+Engin+Kasa', 'R')}
-      ${statCard('Net Bakiye', '₺'+fmt(netBakiye), netBakiye>=0?'Pozitif':'Negatif', netBakiye>=0?'B':'R')}
-      ${statCard('Satış Alacağı', '₺'+fmt(satisAlacak), 'Tahsil edilmemiş', 'A')}
-      ${statCard('Cari Alacak', '₺'+fmt(cariAlacak), 'Tüm cariler — detay için tıkla', 'A', "anaKasaDetay('cari_alacak')")}
-      ${statCard('Sermaye Girişi', '₺'+fmt(sermayeGelen), (DB.sermaye?.odemeler||[]).filter(x=>x.durum==='odendi').length+' ödeme', 'P')}
-    </div>
-
-    <!-- GELİR-GİDER DETAY -->
-    <div class="twoC">
-      <div class="card">
-        <div class="ch">📥 Gelir Kalemleri (Özet)</div>
-        <div class="tw"><table>
-          <thead><tr><th>Kaynak</th><th class="tr">Tutar (₺)</th><th class="tr">%</th></tr></thead>
-          <tbody>
-            ${[
-              {ad:'Satış Tahsilatları',      tutar:satisGelir,    renk:'var(--g)', key:'satis_tahsilat'},
-              {ad:'Operasyonel Kasa Girişi', tutar:kasaGelir,     renk:'var(--g)', key:'kasa_gelir'},
-              {ad:'Engin Tahsilatları',      tutar:enginTahsilat, renk:'var(--g)', key:'engin_tahsilat'},
-              {ad:'ML İade/Tahsilat',        tutar:mlIade,        renk:'var(--t)', key:'ml_gelir'},
-              {ad:'Sermaye Ödemeleri',       tutar:sermayeGelen,  renk:'var(--p)', key:'sermaye'},
-            ].filter(x=>x.tutar>0).map(x=>`<tr style="cursor:pointer" onclick="anaKasaDetay('${x.key}')" title="Detay için tıklayın">
-              <td style="color:var(--a);text-decoration:underline dotted">${x.ad} <span style="font-size:9px;opacity:.6">↗</span></td>
-              <td class="tr" style="font-weight:600;color:${x.renk}">₺${fmt(x.tutar)}</td>
-              <td class="tr" style="color:var(--tx2)">${toplamGelir>0?((x.tutar/toplamGelir)*100).toFixed(1):0}%</td>
-            </tr>`).join('')}
-            <tr style="background:#f0fdf4;font-weight:700">
-              <td>TOPLAM GELİR</td>
-              <td class="tr" style="color:var(--g)">₺${fmt(toplamGelir)}</td>
-              <td class="tr">100%</td>
-            </tr>
-          </tbody>
-        </table></div>
-      </div>
-      <div class="card">
-        <div class="ch">📤 Gider Kalemleri (Özet)</div>
-        <div class="tw"><table>
-          <thead><tr><th>Kaynak</th><th class="tr">Tutar (₺)</th><th class="tr">%</th></tr></thead>
-          <tbody>
-            ${[
-              {ad:'Marmara Lift Harcamaları', tutar:mlGider,   renk:'var(--r)', key:'ml_gider'},
-              {ad:'Engin Harcamaları',         tutar:enginHarc, renk:'var(--r)', key:'engin_harc'},
-              {ad:'Operasyonel Kasa Çıkışı',   tutar:kasaGider, renk:'var(--r)', key:'kasa_gider'},
-            ].filter(x=>x.tutar>0).map(x=>`<tr style="cursor:pointer" onclick="anaKasaDetay('${x.key}')" title="Detay için tıklayın">
-              <td style="color:var(--a);text-decoration:underline dotted">${x.ad} <span style="font-size:9px;opacity:.6">↗</span></td>
-              <td class="tr" style="font-weight:600;color:${x.renk}">₺${fmt(x.tutar)}</td>
-              <td class="tr" style="color:var(--tx2)">${toplamGider>0?((x.tutar/toplamGider)*100).toFixed(1):0}%</td>
-            </tr>`).join('')}
-            <tr style="background:#fef2f2;font-weight:700">
-              <td>TOPLAM GİDER</td>
-              <td class="tr" style="color:var(--r)">₺${fmt(toplamGider)}</td>
-              <td class="tr">100%</td>
-            </tr>
-          </tbody>
-        </table></div>
-      </div>
-    </div>
-
-    <!-- ALACAKLAR -->
     <div class="card">
-      <div class="ch">📋 Tahsil Edilmemiş Alacaklar</div>
+      <div class="ch">👤 Kullanıcı Yönetimi
+        <div class="ch-actions">
+          <button class="btn xs pr" onclick="yeniKullaniciAc()">+ Yeni Kullanıcı</button>
+        </div>
+      </div>
       <div class="tw"><table>
-        <thead><tr><th>Kaynak</th><th>Müşteri/Cari</th><th class="tr">Alacak (₺)</th><th>Durum</th></tr></thead>
-        <tbody>
-          ${DB.satislar.filter(s=>s.tur==='satis'&&s.tutar>s.alinan).map(s=>{
-            const kal=Math.max(0,(s.tutar||0)-(s.alinan||0));
-            return `<tr>
-              <td>${badge('Satış','bB')}</td>
-              <td>${s.firma}</td>
-              <td class="tr" style="font-weight:600;color:var(--r)">₺${fmt(kal)}</td>
-              <td>${badge('Açık','bA')}</td>
-            </tr>`;
-          }).join('')}
-          ${Object.entries(DB.cariler).filter(([k])=>cariSonBakiye(k)>0).map(([k,c])=>`<tr>
-            <td>${badge('Cari','bP')}</td>
-            <td>${c.ad}</td>
-            <td class="tr" style="font-weight:600;color:var(--r)">₺${fmt(cariSonBakiye(k))}</td>
-            <td>${badge('Açık','bA')}</td>
-          </tr>`).join('')}
-          ${sermayeBekleyen>0?`<tr>
-            <td>${badge('Sermaye','bP')}</td>
-            <td>Bekleyen sermaye ödemeleri</td>
-            <td class="tr" style="font-weight:600;color:var(--p)">₺${fmt(sermayeBekleyen)}</td>
-            <td>${badge('Bekliyor','bX')}</td>
-          </tr>`:''}
-          ${(!DB.satislar.some(s=>s.tur==='satis'&&s.tutar>s.alinan) && !Object.keys(DB.cariler).some(k=>cariSonBakiye(k)>0))?
-            trEmpty(4,'Tüm alacaklar tahsil edilmiş ✅'):''}
-        </tbody>
+        <thead><tr><th>Ad Soyad</th><th>Kullanıcı Adı</th><th>Rol</th><th>Durum</th><th></th></tr></thead>
+        <tbody>${kullaniciSatirlari}</tbody>
       </table></div>
-    </div>`;
-}
-
-function anaKasaDetay(key) {
-  let title = ''; let rows = ''; let topTutar = 0;
-
-  if (key === 'satis_tahsilat') {
-    title = '💰 Satış Tahsilatları — Detay';
-    const satirlar = DB.satislar.filter(s => s.tur==='satis' && (s.alinan||0) > 0);
-    topTutar = satirlar.reduce((a,s) => a+(s.alinan||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Firma</th><th>Fatura No</th><th class="tr">Tahsil Edilen</th><th class="tr">Fatura Tutarı</th><th class="tr">Kalan</th><th>Not</th></tr></thead><tbody>`
-      + (satirlar.length ? satirlar.map(s => `<tr>
-        <td>${td(s.tarih)}</td><td>${s.firma}</td><td>${s.fatNo||'—'}</td>
-        <td class="tr" style="color:var(--g);font-weight:600">₺${fmt(s.alinan)}</td>
-        <td class="tr">₺${fmt(s.tutar)}</td>
-        <td class="tr" style="color:${s.tutar>s.alinan?'var(--r)':'var(--g)'}">₺${fmt(Math.max(0,(s.tutar||0)-(s.alinan||0)))}</td>
-        <td>${s.not||'—'}</td>
-      </tr>`).join('') : '<tr><td colspan="7" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'kasa_gelir') {
-    title = '📥 Operasyonel Kasa Girişleri — Detay';
-    topTutar = DB.kasa.gelir.reduce((a,x) => a+(x.tutar||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Açıklama</th><th class="tr">Tutar</th><th>Not</th></tr></thead><tbody>`
-      + (DB.kasa.gelir.length ? DB.kasa.gelir.map(x => `<tr>
-        <td>${td(x.tarih)}</td><td>${x.ad||x.kat||'—'}</td>
-        <td class="tr" style="color:var(--g);font-weight:600">₺${fmt(x.tutar)}</td><td>${x.not||'—'}</td>
-      </tr>`).join('') : '<tr><td colspan="4" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'engin_tahsilat') {
-    title = '💵 Engin Tahsilatları — Detay';
-    topTutar = DB.enginTahsilat.reduce((a,x) => a+(x.tutar||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Kimden</th><th class="tr">Tutar</th><th>Açıklama</th></tr></thead><tbody>`
-      + (DB.enginTahsilat.length ? DB.enginTahsilat.map(x => `<tr>
-        <td>${td(x.tarih)}</td><td>${x.kimden||'—'}</td>
-        <td class="tr" style="color:var(--g);font-weight:600">₺${fmt(x.tutar)}</td><td>${x.acik||'—'}</td>
-      </tr>`).join('') : '<tr><td colspan="4" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'ml_gelir') {
-    title = '🔄 ML İade/Tahsilat — Detay';
-    const items = DB.marmaraLift.filter(x => x.tip==='gelir');
-    topTutar = items.reduce((a,x) => a+(x.tutar||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th class="tr">Tutar</th><th>Not</th></tr></thead><tbody>`
-      + (items.length ? items.map(x => `<tr>
-        <td>${td(x.tarih)}</td><td>${x.ad||'—'}</td><td>${badge(x.kat||'—','bX')}</td>
-        <td class="tr" style="color:var(--t);font-weight:600">₺${fmt(x.tutar)}</td><td>${x.not||'—'}</td>
-      </tr>`).join('') : '<tr><td colspan="5" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'sermaye') {
-    title = '🏦 Sermaye Ödemeleri — Detay';
-    const items = (DB.sermaye?.odemeler||[]).filter(x => x.durum==='odendi');
-    topTutar = items.reduce((a,x) => a+(x.tutar||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Ortak</th><th class="tr">Tutar</th><th>Not</th></tr></thead><tbody>`
-      + (items.length ? items.map(x => {
-          const o = DB.sermaye.ortaklar.find(oo => oo.id===x.ortakId);
-          return `<tr><td>${td(x.tarih)}</td><td>${o?.ad||'—'}</td>
-            <td class="tr" style="color:var(--p);font-weight:600">₺${fmt(x.tutar)}</td><td>${x.not||'—'}</td></tr>`;
-        }).join('') : '<tr><td colspan="4" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'ml_gider') {
-    title = '📤 Marmara Lift Harcamaları — Detay';
-    const items = DB.marmaraLift.filter(x => x.tip==='gider');
-    topTutar = items.reduce((a,x) => a+(x.tutar||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th class="tr">Tutar</th><th>Not</th></tr></thead><tbody>`
-      + (items.length ? items.map(x => `<tr>
-        <td>${td(x.tarih)}</td><td>${x.ad||'—'}</td><td>${badge(x.kat||'—','bX')}</td>
-        <td class="tr" style="color:var(--r);font-weight:600">₺${fmt(x.tutar)}</td><td>${x.not||'—'}</td>
-      </tr>`).join('') : '<tr><td colspan="5" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'engin_harc') {
-    title = '📤 Engin Harcamaları — Detay';
-    topTutar = DB.enginHarcama.reduce((a,x) => a+(x.tutar||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Açıklama</th><th>Kategori</th><th class="tr">Tutar</th><th>Not</th></tr></thead><tbody>`
-      + (DB.enginHarcama.length ? DB.enginHarcama.map(x => `<tr>
-        <td>${td(x.tarih)}</td><td>${x.ad||x.kat||'—'}</td><td>${badge(x.kat||'—','bX')}</td>
-        <td class="tr" style="color:var(--r);font-weight:600">₺${fmt(x.tutar)}</td><td>${x.not||'—'}</td>
-      </tr>`).join('') : '<tr><td colspan="5" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'kasa_gider') {
-    title = '📤 Operasyonel Kasa Çıkışları — Detay';
-    topTutar = DB.kasa.gider.reduce((a,x) => a+(x.tutar||0), 0);
-    rows = `<thead><tr><th>Tarih</th><th>Açıklama</th><th class="tr">Tutar</th><th>Not</th></tr></thead><tbody>`
-      + (DB.kasa.gider.length ? DB.kasa.gider.map(x => `<tr>
-        <td>${td(x.tarih)}</td><td>${x.ad||x.kat||'—'}</td>
-        <td class="tr" style="color:var(--r);font-weight:600">₺${fmt(x.tutar)}</td><td>${x.not||'—'}</td>
-      </tr>`).join('') : '<tr><td colspan="4" class="tc">Kayıt yok</td></tr>') + '</tbody>';
-
-  } else if (key === 'cari_alacak') {
-    title = '📋 Cari Alacaklar — Detay';
-    const cariler = Object.entries(DB.cariler).filter(([k]) => cariSonBakiye(k) > 0);
-    topTutar = cariler.reduce((a,[k]) => a+cariSonBakiye(k), 0);
-    rows = `<thead><tr><th>Cari Adı</th><th class="tr">Bakiye</th><th>Durum</th></tr></thead><tbody>`
-      + (cariler.length ? cariler.map(([k,c]) => `<tr style="cursor:pointer" onclick="mKapat('mo-akd');_cariHarKey='${k}';rCariDetay()">
-        <td style="color:var(--a);text-decoration:underline dotted">${c.ad} ↗</td>
-        <td class="tr" style="color:var(--r);font-weight:600">₺${fmt(cariSonBakiye(k))}</td>
-        <td>${badge('Açık','bA')}</td>
-      </tr>`).join('') : '<tr><td colspan="3" class="tc">Açık cari alacak yok</td></tr>') + '</tbody>';
-  }
-
-  const body = `
-    <div class="fsuccess" style="margin-bottom:12px;font-size:13px;font-weight:600">
-      Toplam: ₺${fmt(topTutar)}
     </div>
-    <div class="tw"><table>${rows}</table></div>`;
 
-  modalOlustur('mo-akd', title, body,
-    `<button class="btn pr" onclick="mKapat('mo-akd')">Kapat</button>`, 'lg');
-  mAc('mo-akd');
+    <div class="card">
+      <div class="ch">🛡️ Rol Tanımları</div>
+      <div class="cb">
+        ${Object.entries(ROL_TANIMLARI).map(([key, rol]) => `
+          <div style="padding:10px 0;border-bottom:1px solid var(--bdr)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <b>${rol.ad}</b>
+              <span class="badge ${rol.renk}">${key}</span>
+            </div>
+            <div style="font-size:11px;color:var(--tx2)">
+              📺 Erişebileceği ekranlar: ${rol.ekranlar.length} ekran
+              &nbsp;|&nbsp;
+              ✅ Yapabilecekleri: ${Object.values(rol.islemler).filter(Boolean).length} işlem
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ch">⚙️ Sistem Ayarları</div>
+      <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn gn" onclick="dbYedekle()" style="justify-content:flex-start">
+          💾 Tüm Verileri Yedekle (JSON)
+        </button>
+        <button class="btn" onclick="document.getElementById('db-yukle-input').click()" style="justify-content:flex-start">
+          📂 JSON Dosyasından Yükle
+        </button>
+        <button class="btn" onclick="excelImportAc()" style="justify-content:flex-start">
+          📊 Excel'den Veri Yükle
+        </button>
+        <hr style="border:none;border-top:1px solid var(--bdr)">
+        <button class="btn dn" onclick="dbSifirlaOnay()" style="justify-content:flex-start">
+          🗑 Tüm Verileri Sıfırla (Tehlikeli!)
+        </button>
+      </div>
+    </div>
+    <input type="file" id="db-yukle-input" accept=".json" style="display:none" onchange="dbYukleJSON(this)">`;
 }
 
 /* ════════════════════════════════════
