@@ -2,8 +2,23 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Marmara Lider Kimya — Yönetim Sistemi v4</title>
+
+<!-- PWA -->
+<meta name="application-name" content="MLK Yönetim">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MLK">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0e1720">
+<meta name="description" content="Marmara Lider Kimya Yönetim Sistemi">
+
+<!-- iOS ikonları -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%232563eb'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3EMLK%3C/text%3E%3C/svg%3E">
+
+<!-- Manifest inline -->
+<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22Marmara+Lider+Kimya%22%2C%22short_name%22%3A%22MLK%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230e1720%22%2C%22theme_color%22%3A%22%232563eb%22%2C%22orientation%22%3A%22portrait%22%7D">
 <style>
 /* ════════════════════════════════════════
    MARMARA LİDER KİMYA — STYLE v4
@@ -211,6 +226,17 @@ body.sadece-goruntule .ch-actions { display: none !important; }
 <body>
 
 <!-- ════ GİRİŞ EKRANI ════ -->
+<!-- PWA Kurulum Banner -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1e3a5f;color:#fff;padding:12px 16px;z-index:9999;display:none;align-items:center;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,.4)">
+  <div style="width:36px;height:36px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">MLK</div>
+  <div style="flex:1">
+    <div style="font-weight:600;font-size:13px">Ana Ekrana Ekle</div>
+    <div style="font-size:11px;opacity:.7">Uygulama gibi kullanın</div>
+  </div>
+  <button onclick="pwaCur()" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">Ekle</button>
+  <button onclick="document.getElementById('pwa-banner').style.display='none'" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:0 4px;opacity:.6">✕</button>
+</div>
+
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">
@@ -221,10 +247,10 @@ body.sadece-goruntule .ch-actions { display: none !important; }
       </div>
     </div>
     <div id="login-error" class="login-error" style="display:none"></div>
-    <div class="fr"><label>Kullanıcı Adı</label><input id="l-user" type="text" placeholder="kullanici_adi" autocomplete="username"></div>
+    <div class="fr"><label>Kullanıcı Adı</label><input id="l-user" type="text" placeholder="kullanici_adi" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')"></div>
     <div class="fr"><label>Şifre</label>
       <div style="position:relative">
-        <input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')loginYap()">
+        <input id="l-pass" type="password" placeholder="••••••••" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" onkeydown="if(event.key==='Enter')loginYap()">
         <button onclick="togglePass()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--tx2);font-size:14px" id="pass-eye">👁</button>
       </div>
     </div>
@@ -768,8 +794,12 @@ function cikisYap() {
   currentUser = null;
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('l-user').value = '';
-  document.getElementById('l-pass').value = '';
+  // Tarayıcı autofill'den sonra temizle
+  setTimeout(() => {
+    document.getElementById('l-user').value = '';
+    document.getElementById('l-pass').value = '';
+    document.getElementById('l-user').focus();
+  }, 100);
 }
 
 function togglePass() {
@@ -786,14 +816,31 @@ function togglePass() {
 
 // Sayfa yüklenince session kontrolü
 window.addEventListener('DOMContentLoaded', () => {
+  // Tarayıcı autofill engelle
+  setTimeout(() => {
+    const u = document.getElementById('l-user');
+    const p = document.getElementById('l-pass');
+    if (u) u.value = '';
+    if (p) p.value = '';
+  }, 300);
+
   const saved = sessionStorage.getItem('mlk_user');
   if (saved) {
     try {
-      currentUser = JSON.parse(saved);
-      document.getElementById('login-screen').style.display = 'none';
-      const appEl = document.getElementById('app');
-      appEl.style.display = 'flex';
-      document.getElementById('sb-user-label').textContent = currentUser.name;
+      const savedUser = JSON.parse(saved);
+      // USERS dizisinden güncel bilgiyi al (rol değişmiş olabilir)
+      const freshUser = USERS.find(u => u.username === savedUser.username);
+      if (freshUser && freshUser.aktif !== false) {
+        currentUser = freshUser;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        document.getElementById('sb-user-label').textContent = currentUser.name;
+        const rolEl = document.getElementById('sb-user-role');
+        if (rolEl) rolEl.textContent = ROL_SABLONLARI[currentUser.role]?.ad || currentUser.role;
+        yetkiSidebarGuncelle();
+      } else {
+        sessionStorage.removeItem('mlk_user');
+      }
     } catch(e) {
       sessionStorage.removeItem('mlk_user');
     }
@@ -847,6 +894,21 @@ let cloudSyncEnabled = false;
 
 /* ── YÜKLEME ── */
 function dbYukle() {
+  // Kullanıcıları localStorage'dan yükle (admin hariç yakup her zaman kalır)
+  try {
+    const savedUsers = localStorage.getItem(SK + '_users');
+    if (savedUsers) {
+      const loadedUsers = JSON.parse(savedUsers);
+      // yakup her zaman en güncel haliyle kalmalı
+      USERS.length = 0;
+      loadedUsers.forEach(u => USERS.push(u));
+      // yakup yoksa ekle
+      if (!USERS.find(u => u.username === 'yakup')) {
+        USERS.unshift({ id: 1, username: 'yakup', password: 'marmara54', name: 'Yakup Bey', role: 'admin', aktif: true, ozelYetkiler: null });
+      }
+    }
+  } catch(e) { console.warn('Kullanıcı yükleme hatası:', e); }
+
   try {
     const raw = localStorage.getItem(SK);
     if (raw) {
@@ -881,16 +943,20 @@ function dbYukle() {
   setSyn('ok');
   // Supabase'den güncel veriyi çek
   supaYukle().then(row => {
-    if (!row) return;
-    // Supabase'deki veri localStorage'dakinden daha yeni mi?
+    if (!row || !row.data) return;
     const supaTime = new Date(row.updated_at).getTime();
     const localTime = parseInt(localStorage.getItem(SK + '_ts') || '0');
     if (supaTime > localTime) {
       DB = row.data;
-      if (!DB.ids) DB.ids = DEF_DB.ids;
+      // Eksik alanları tamamla
+      if (!DB.ids)             DB.ids = DEF_DB.ids;
       if (!DB.giderEkstralari) DB.giderEkstralari = [];
-      if (!DB.virmanlar) DB.virmanlar = [];
-      if (!DB.faturalar) DB.faturalar = [];
+      if (!DB.virmanlar)       DB.virmanlar = [];
+      if (!DB.faturalar)       DB.faturalar = [];
+      if (!DB.kasa)            DB.kasa = { gelir: [], gider: [] };
+      // DEF_DB'deki kasa kayıtlarını ekle
+      DEF_DB.kasa.gelir.forEach(d => { if (!DB.kasa.gelir.find(x => x.id === d.id)) DB.kasa.gelir.push({...d}); });
+      DEF_DB.kasa.gider.forEach(d => { if (!DB.kasa.gider.find(x => x.id === d.id)) DB.kasa.gider.push({...d}); });
       localStorage.setItem(SK, JSON.stringify(DB));
       localStorage.setItem(SK + '_ts', supaTime.toString());
       cariNavGuncelle();
@@ -898,6 +964,8 @@ function dbYukle() {
       setSyn('cloud');
       toast('☁️ Buluttan güncel veri yüklendi', 'ok');
     }
+  }).catch(e => {
+    console.warn('Supabase sync atlandı:', e);
   });
 }
 
@@ -958,6 +1026,8 @@ function dbKaydet(aciklama) {
     try {
       localStorage.setItem(SK, JSON.stringify(DB));
       localStorage.setItem(SK + '_ts', Date.now().toString());
+      // Kullanıcıları da kaydet
+      localStorage.setItem(SK + '_users', JSON.stringify(USERS));
       setSyn('ok');
       // Supabase'e de kaydet
       supaKaydet().then(ok => {
@@ -1053,21 +1123,30 @@ function bulutMenu() {
 }
 
 async function supaYukleForce() {
-  toast('☁️ Buluttan veri çekiliyor...', 'ok');
-  const row = await supaYukle();
+  toast('☁️ Buluta bağlanılıyor...', 'ok');
+  let row = null;
+  try {
+    row = await supaYukle();
+  } catch(e) {}
+
   if (!row || !row.data || Object.keys(row.data).length === 0) {
-    toast('Bulutta veri bulunamadı', 'err'); return;
+    toast('⚠️ Buluta bağlanılamadı. İnternet bağlantınızı kontrol edin.', 'err');
+    return;
   }
   DB = row.data;
-  if (!DB.ids) DB.ids = DEF_DB.ids;
+  if (!DB.ids)             DB.ids = DEF_DB.ids;
   if (!DB.giderEkstralari) DB.giderEkstralari = [];
-  if (!DB.virmanlar) DB.virmanlar = [];
-  if (!DB.faturalar) DB.faturalar = [];
+  if (!DB.virmanlar)       DB.virmanlar = [];
+  if (!DB.faturalar)       DB.faturalar = [];
+  if (!DB.kasa)            DB.kasa = { gelir: [], gider: [] };
+  DEF_DB.kasa.gelir.forEach(d => { if (!DB.kasa.gelir.find(x=>x.id===d.id)) DB.kasa.gelir.push({...d}); });
+  DEF_DB.kasa.gider.forEach(d => { if (!DB.kasa.gider.find(x=>x.id===d.id)) DB.kasa.gider.push({...d}); });
   localStorage.setItem(SK, JSON.stringify(DB));
   localStorage.setItem(SK + '_ts', new Date(row.updated_at).getTime().toString());
   cariNavGuncelle();
   go(AP);
-  toast('✅ Buluttan veri yüklendi!', 'ok');
+  setSyn('cloud');
+  toast('✅ Buluttan güncel veriler yüklendi!', 'ok');
 }
 
 function cloudSync() {
@@ -2271,13 +2350,18 @@ function ciKaydet() {
   // TAHSİLAT → kasaya otomatik ekle (sadece yeni kayıt, düzenleme değil)
   if (!_cariHarId && tur === 'tahsilat' && tahsilat > 0) {
     if (!DB.kasa) DB.kasa = { gelir: [], gider: [] };
+    const kasaId = nid('kag');
     DB.kasa.gelir.push({
-      id: nid('kag'),
+      id: kasaId,
       tarih,
       ad: c.ad + ' TAHSİLAT' + (obj.acik ? ' — ' + obj.acik : ''),
       tutar: tahsilat,
       cariRef: key
     });
+    // Harekete kasaId bağla — silince kesin eşleşsin
+    obj.kasaId = kasaId;
+    const harIdx = c.hareketler.findIndex(h => h.id === obj.id);
+    if (harIdx > -1) c.hareketler[harIdx].kasaId = kasaId;
   }
 
   mKapat('mo-cari-har');
@@ -2287,11 +2371,22 @@ function ciKaydet() {
 }
 
 function cariHarSil(key, id) {
-  if (!isAdmin()) { yetkiYok(); return; }
+  if (!canDo('hareket_sil')) { yetkiYok(); return; }
   konfirm('Hareketi Sil', 'Bu hareketi silmek istediğinize emin misiniz? Bakiye otomatik güncellenecektir.', () => {
     const c = DB.cariler[key];
+    const har = c.hareketler.find(h => h.id === id);
+
+    // Tahsilat ise kasadan da sil
+    if (har && har.tur === 'tahsilat' && har.tahsilat > 0) {
+      const kasaIdx = DB.kasa.gelir.findIndex(x =>
+        (har.kasaId && x.id === har.kasaId) ||
+        (x.cariRef === key && Math.abs(x.tutar - har.tahsilat) < 0.01 && x.tarih === har.tarih)
+      );
+      if (kasaIdx > -1) DB.kasa.gelir.splice(kasaIdx, 1);
+    }
+
     c.hareketler = c.hareketler.filter(h => h.id !== id);
-    c.hareketler = _bakiyeHesapla(c.hareketler); // bakiyeyi düzelt
+    c.hareketler = _bakiyeHesapla(c.hareketler);
     dbKaydet();
     sonGuncelle(rCariDetay);
     toast('🗑 Hareket silindi');
@@ -6208,7 +6303,10 @@ function kulKaydet(id) {
     const u = USERS.find(x => x.id === id);
     if (u) { u.name = ad; u.role = rol; u.aktif = aktif; }
   }
-  mKapat('mo-ku'); rAyarlar(); toast('✅ Kullanıcı kaydedildi', 'ok');
+  mKapat('mo-ku');
+  localStorage.setItem(SK + '_users', JSON.stringify(USERS));
+  rAyarlar();
+  toast('✅ Kullanıcı kaydedildi', 'ok');
 }
 
 function kulSil(id) {
@@ -6216,6 +6314,7 @@ function kulSil(id) {
   if (!u || u.username === 'yakup') { toast('Bu kullanıcı silinemez!', 'err'); return; }
   konfirm('Kullanıcı Sil', `"${u.name}" silinsin mi?`, () => {
     USERS.splice(USERS.findIndex(x => x.id === id), 1);
+    localStorage.setItem(SK + '_users', JSON.stringify(USERS));
     rAyarlar(); toast('🗑 Kullanıcı silindi');
   });
 }
@@ -6507,6 +6606,50 @@ const SUPA_HEADERS = { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, '
 
 async function supaKaydet() {
   try {
+    const payload = { id: 1, data: DB, updated_at: new Date().toISOString() };
+    const res = await fetch(SUPA_URL + '/rest/v1/mlk_data?id=eq.1', {
+      method: 'PATCH',
+      headers: { ...SUPA_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const res2 = await fetch(SUPA_URL + '/rest/v1/mlk_data', {
+        method: 'POST',
+        headers: { ...SUPA_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
+        body: JSON.stringify(payload)
+      });
+      return res2.ok;
+    }
+    localStorage.setItem(SK + '_ts', Date.now().toString());
+    return true;
+  } catch(e) {
+    // Sessizce geç — yerel kayıt zaten yapıldı
+    return false;
+  }
+}
+
+async function supaYukle() {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000); // 8 sn timeout
+    const res = await fetch(SUPA_URL + '/rest/v1/mlk_data?id=eq.1&select=data,updated_at', {
+      method: 'GET',
+      headers: SUPA_HEADERS,
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const rows = await res.json();
+    if (rows && rows.length > 0 && rows[0].data) return rows[0];
+    return null;
+  } catch(e) {
+    // Sessizce geç — bağlantı sorunu normal
+    return null;
+  }
+}
+
+async function supaKaydet() {
+  try {
     const res = await fetch(SUPA_URL + '/rest/v1/mlk_data', {
       method: 'POST',
       headers: { ...SUPA_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
@@ -6655,6 +6798,36 @@ function appInit() {
 
 // Sayfa değişince session'a kaydet
 const _origGo = go;
+/* ── PWA KURULUM ── */
+let _pwaDeferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaDeferredPrompt = e;
+  // Banner'ı göster (standalone modda değilse)
+  if (!window.matchMedia('(display-mode: standalone)').matches) {
+    const banner = document.getElementById('pwa-banner');
+    if (banner) banner.style.display = 'flex';
+  }
+});
+
+function pwaCur() {
+  if (_pwaDeferredPrompt) {
+    _pwaDeferredPrompt.prompt();
+    _pwaDeferredPrompt.userChoice.then(() => {
+      _pwaDeferredPrompt = null;
+      const banner = document.getElementById('pwa-banner');
+      if (banner) banner.style.display = 'none';
+    });
+  }
+}
+
+window.addEventListener('appinstalled', () => {
+  const banner = document.getElementById('pwa-banner');
+  if (banner) banner.style.display = 'none';
+  toast('✅ Uygulama ana ekrana eklendi!', 'ok');
+});
+
 window.addEventListener('beforeunload', () => {
   sessionStorage.setItem('mlk_last_page', AP);
 });
@@ -6946,9 +7119,10 @@ function rSermaye() {
 
     <div class="sg">
       ${statCard('Toplam Ödenen', '₺'+fmt(topOdendi), DB.sermaye.odemeler.filter(x=>x.durum==='odendi').length+' ödeme', 'G')}
-      ${statCard('İade / Mahsup', '₺'+fmt(topIade), DB.sermaye.iadeler.length+' kayıt', 'R')}
+      ${statCard('Kalan Sermaye', '₺'+fmt(Math.max(0,topHedef-topOdendi)), topHedef?'Hedef: ₺'+fmt(topHedef):'Hedef girilmemiş', 'R')}
+      ${statCard('İade / Mahsup', '₺'+fmt(topIade), DB.sermaye.iadeler.length+' kayıt', 'A')}
       ${statCard('Net Sermaye', '₺'+fmt(topOdendi-topIade), 'Ödenen − İade', 'B')}
-      ${statCard('Bekleyen', '₺'+fmt(topBekliyor), '', 'A')}
+      ${topBekliyor > 0 ? statCard('Bekleyen', '₺'+fmt(topBekliyor), '', 'A') : ''}
     </div>
 
     <!-- ORTAKLAR -->
@@ -6959,13 +7133,18 @@ function rSermaye() {
         </div>
       </div>
       <div class="tw"><table>
-        <thead><tr><th>#</th><th>Ortak</th><th class="tr">Pay%</th><th class="tr">Hedef</th><th class="tr">Ödenen</th><th class="tr">Fazla Ödeme</th><th class="tr">İade/Mahsup</th><th class="tr">Net Bakiye</th><th></th></tr></thead>
-        <tbody>${ortakOzet.length ? ortakOzet.map((o,i) => `<tr>
+        <thead><tr><th>#</th><th>Ortak</th><th class="tr">Pay%</th><th class="tr">Hedef</th><th class="tr">Ödenen</th><th class="tr">Kalan</th><th class="tr">Fazla Ödeme</th><th class="tr">İade/Mahsup</th><th class="tr">Net Bakiye</th><th></th></tr></thead>
+        <tbody>${ortakOzet.length ? ortakOzet.map((o,i) => {
+          const kalan = Math.max(0, (o.hedef||0) - o.odendi);
+          return `<tr>
           <td>${i+1}</td>
           <td style="font-weight:600">${o.ad}</td>
           <td class="tr">${o.pay||0}%</td>
           <td class="tr">${o.hedef?'₺'+fmt(o.hedef):'—'}</td>
           <td class="tr" style="color:var(--g);font-weight:600">₺${fmt(o.odendi)}</td>
+          <td class="tr" style="font-weight:700;color:${kalan>0?'var(--r)':'var(--g)'}">
+            ${kalan>0 ? '₺'+fmt(kalan) : '<span style="color:var(--g)">✅ Tamam</span>'}
+          </td>
           <td class="tr" style="color:${o.fazla>0?'var(--a)':'var(--tx2)'}">
             ${o.fazla>0?'<b>₺'+fmt(o.fazla)+'</b> fazla':'—'}
           </td>
@@ -6976,7 +7155,7 @@ function rSermaye() {
             <button class="btn xs te" onclick="ortakEkleAc(${o.id})">✏️</button>
             <button class="btn xs dn" onclick="ortakSil(${o.id})">🗑</button>
           </div></td>
-        </tr>`).join('') : trEmpty(9, 'Ortak eklenmemiş')}</tbody>
+        </tr>`;}).join('') : trEmpty(10, 'Ortak eklenmemiş')}</tbody>
       </table></div>
     </div>
 
