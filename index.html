@@ -55,6 +55,45 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 #sb{width:230px;flex-shrink:0;background:var(--side);display:flex;flex-direction:column;height:100vh;overflow-y:auto}
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 .page{flex:1;overflow-y:auto;padding:18px;display:none}
+
+/* ── MOBİL ── */
+#sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:199;backdrop-filter:blur(2px)}
+#mb-toggle{display:none;background:none;border:none;color:var(--tx);font-size:22px;cursor:pointer;padding:4px 8px;margin-right:4px;line-height:1}
+
+@media(max-width:768px){
+  #mb-toggle{display:flex;align-items:center}
+  #sb{position:fixed;left:-240px;top:0;z-index:200;height:100%;width:240px;
+      transition:left .25s cubic-bezier(.4,0,.2,1);box-shadow:none}
+  #sb.acik{left:0;box-shadow:6px 0 24px rgba(0,0,0,.35)}
+  #sb-overlay.acik{display:block}
+  #main{width:100%}
+  .page{padding:10px}
+  .topbar{padding:0 8px;height:48px}
+  .topbar-title{font-size:13px}
+  .topbar-date{display:none}
+  .tbtn span{display:none}
+  .tbtn{padding:5px 7px;font-size:11px;min-width:0}
+  .sg{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .sc{padding:10px 12px}
+  .sc .l{font-size:9px}
+  .sc .v{font-size:18px}
+  .sc .s{font-size:10px}
+  .card{margin-bottom:10px;border-radius:10px}
+  .ch{padding:10px 12px;font-size:12.5px;flex-wrap:wrap;gap:6px}
+  .tw{max-height:none;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:11px;min-width:100%}
+  th,td{padding:5px 7px!important}
+  .twoC,.threeC{grid-template-columns:1fr!important;gap:10px}
+  .fg2,.fg3{grid-template-columns:1fr!important;gap:6px}
+  .modal-overlay .modal-box{width:96vw!important;max-width:96vw!important;max-height:88vh;margin:6px auto}
+  .td-actions{gap:3px}
+  .btn.xs{padding:4px 7px;font-size:11px}
+  .uy-bidon-row{flex-wrap:wrap}
+  .cari-card{padding:11px 13px}
+  .finfo,.fwarn,.fsuccess{font-size:12px;padding:8px 10px}
+  .login-card{width:92vw!important;max-width:92vw!important;padding:20px 16px!important}
+  #pwa-banner{padding:10px 12px}
+}
 .sbh{padding:15px 13px 11px;border-bottom:1px solid rgba(255,255,255,.06)}
 .sblogo{display:flex;align-items:center;gap:9px}
 .logo{width:36px;height:36px;background:var(--acc);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
@@ -265,6 +304,7 @@ body.sadece-goruntule .ch-actions { display: none !important; }
 <div id="app" style="display:none;height:100vh;display:none;flex-direction:row">
 
   <!-- SIDEBAR -->
+  <div id="sb-overlay" onclick="sbKapat()"></div>
   <nav id="sb">
     <div class="sbh">
       <div class="sblogo">
@@ -290,6 +330,7 @@ body.sadece-goruntule .ch-actions { display: none !important; }
     <div class="sbs"><div class="sbsl">Üretim</div>
       <div class="ni" onclick="go('uretim',this)" data-ekran="uretim"><span class="ic">⚗️</span>Üretim</div>
       <div class="ni" onclick="go('hammadde',this)" data-ekran="hammadde"><span class="ic">🧪</span>Hammadde Stoğu</div>
+      <div class="ni" onclick="go('bedelsiz',this)" data-ekran="bedelsiz"><span class="ic">🎁</span>Bedelsiz Numune</div>
       <div class="ni" onclick="go('urun_stok',this)" data-ekran="urun_stok"><span class="ic">📦</span>Ürün Stoğu</div>
       <div class="ni" onclick="go('maliyet',this)" data-ekran="maliyet"><span class="ic">📐</span>Üretim Maliyeti</div>
     </div>
@@ -309,9 +350,11 @@ body.sadece-goruntule .ch-actions { display: none !important; }
   <!-- MAIN -->
   <div id="main">
     <div class="topbar">
+      <button id="mb-toggle" onclick="sbToggle()" title="Menü">☰</button>
       <div class="topbar-title" id="ptitle">Özet Dashboard</div>
       <div class="topbar-date" id="pdate"></div>
       <button class="tbtn" onclick="undoGoster()" title="Geri Al (son 20 işlem)">↩️ Geri Al</button>
+      <button class="tbtn" onclick="otoyedekGoster()" title="Otomatik yedekler" style="color:#f59e0b">🕐 Yedekler</button>
       <button class="tbtn" onclick="exportJSON()" title="Yerel yedek al">💾 Yedekle</button>
       <button class="tbtn dk" onclick="importJSON()" title="Yerel yedekten yükle">📂 Yükle</button>
       <div id="cloud-badge" class="cloud-badge" onclick="bulutMenu()" title="Yedek al / yükle" style="cursor:pointer">☁️ Bulut</div>
@@ -333,6 +376,7 @@ body.sadece-goruntule .ch-actions { display: none !important; }
     <div class="page" id="page-hammadde"></div>
     <div class="page" id="page-urun_stok"></div>
     <div class="page" id="page-maliyet"></div>
+    <div class="page" id="page-bedelsiz"></div>
     <div class="page" id="page-fatura"></div>
     <div class="page" id="page-rapor"></div>
     <div class="page" id="page-ayarlar"></div>
@@ -374,6 +418,14 @@ const CARI_TURLER = {
 
 // ── Standart bidon boyutları ──
 const BIDON_BOYUTLAR = ['1','5','10','20','60'];
+const AMBALAJ_TIPLERI = ['Bidon', 'Varil', 'IBC Tank', 'Koli', 'Torba', 'Çuval', 'Diğer'];
+
+function bidonBoyOpts(secili) {
+  return BIDON_BOYUTLAR.map(b => `<option value="${b}" ${b===String(secili)?'selected':''}>${b} lt</option>`).join('') +
+    `<option value="litre" ${secili==='litre'?'selected':''}>Litre (Manuel)</option>` +
+    `<option value="ibc" ${secili==='ibc'?'selected':''}>IBC Tank (Manuel)</option>` +
+    `<option value="diger" ${!BIDON_BOYUTLAR.includes(String(secili))&&secili&&secili!=='litre'&&secili!=='ibc'?'selected':''}>Diğer (Manuel)</option>`;
+}
 function bidonBoyOpts(secili='5') {
   return BIDON_BOYUTLAR.map(b => `<option value="${b}" ${b===String(secili)?'selected':''}>${b} lt</option>`).join('') +
     `<option value="diger" ${!BIDON_BOYUTLAR.includes(String(secili))&&secili?'selected':''}>Diğer (Manuel)</option>`;
@@ -921,9 +973,11 @@ function dbYukle() {
       DB = JSON.parse(raw);
       if (!DB.ids) DB.ids = DEF_DB.ids;
       if (!DB.giderEkstralari) DB.giderEkstralari = [];
-      if (!DB.virmanlar) DB.virmanlar = [];
-      if (!DB.faturalar) DB.faturalar = [];
-      if (!DB.cariler) DB.cariler = {};
+      if (!DB.virmanlar)       DB.virmanlar = [];
+      if (!DB.faturalar)       DB.faturalar = [];
+      if (!DB.cariler)         DB.cariler = {};
+      if (!DB.urunStok)        DB.urunStok = JSON.parse(JSON.stringify(DEF_DB.urunStok));
+      if (!DB.urunHareketler)  DB.urunHareketler = JSON.parse(JSON.stringify(DEF_DB.urunHareketler));
       Object.keys(DEF_DB.cariler).forEach(k => {
         if (!DB.cariler[k]) DB.cariler[k] = JSON.parse(JSON.stringify(DEF_DB.cariler[k]));
       });
@@ -1895,32 +1949,26 @@ function _bakiyeHesapla(hareketler) {
     const alacak = h.tahsilat || 0;
 
     if (h.tur === 'satis' || h.tur === 'iade_ver') {
-      // Satış: borç artar
       bak += borc;
     } else if (h.tur === 'tahsilat' || h.tur === 'iade_al') {
-      // Tahsilat: borç azalır
+      // Fazla tahsilat negatife düşebilir → müşteri alacaklı olur
       bak -= alacak;
-      if (bak < 0) bak = 0;
     } else if (h.tur === 'virman_cikis') {
-      // Virman çıkışı: kaynak carinin borcu AZALIR (tahsilat gibi)
-      // tutar veya tahsilat alanında tutulabilir
+      // Virman çıkışı: kaynak carinin borcu AZALIR
       const miktar = alacak > 0 ? alacak : borc;
       bak -= miktar;
-      if (bak < 0) bak = 0;
     } else if (h.tur === 'virman_giris') {
-      // Virman girişi: hedef carinin borcu ARTAR (satış gibi)
+      // Virman girişi: hedef carinin borcu ARTAR
       const miktar = borc > 0 ? borc : alacak;
       bak += miktar;
     } else if (h.tur === 'bedelsiz_ver') {
-      // tutar > 0 → bakiyeye borç ekle
-      // tahsilat > 0 → bakiyeden düş
       bak += borc;
       bak -= alacak;
-      if (bak < 0) bak = 0;
     }
     // bedelsiz_al, diger: bakiyeyi değiştirmez
 
-    return { ...h, bakiye: Math.max(0, bak) };
+    // Negatif bakiye = müşteri alacaklı (biz borçluyuz) — 0'a kısıtlama YOK
+    return { ...h, bakiye: Math.round(bak * 100) / 100 };
   });
 }
 
@@ -2288,18 +2336,19 @@ function ciKaydet() {
     const bedBirim  = fNum('ci-bed-birim') || birim;
     const stoktan   = document.getElementById('ci-bed-stoktan')?.checked !== false;
     const borcYaz   = document.getElementById('ci-bed-bakiye-borc')?.checked;
-    const borcDus   = document.getElementById('ci-bed-borctan')?.checked;
+    // Varsayılan: borcDus = true (bakiyeden düş)
+    const borcDusEl = document.getElementById('ci-bed-borctan');
+    const borcDus   = borcDusEl ? borcDusEl.checked : true;
     const borcTutar = fNum('ci-bed-borctutar') || (bedAdet * bedBirim);
     const tahTutar  = fNum('ci-bed-tahtutar')  || (bedAdet * bedBirim);
 
     obj.adet  = bedAdet;
     obj.birim = bedBirim;
-    // Bakiyeye etkiyi seçime göre belirle
-    obj.tutar    = borcYaz ? borcTutar : 0;   // bakiyeye borç eklensin mi
-    obj.tahsilat = borcDus ? tahTutar  : 0;   // bakiyeden tahsilat düşülsün mü
-    obj.bedStoktan   = stoktan;
-    obj.bedBorcYaz   = borcYaz   || false;
-    obj.bedBorcDus   = borcDus   || false;
+    obj.tutar    = borcYaz ? borcTutar : 0;
+    obj.tahsilat = borcDus ? tahTutar  : 0;
+    obj.bedStoktan = stoktan;
+    obj.bedBorcYaz = borcYaz   || false;
+    obj.bedBorcDus = borcDus   || false;
 
     // 1) Stoktan düş → ürün hareketine çıkış kaydı
     if (stoktan && !_cariHarId) {
@@ -2333,6 +2382,8 @@ function ciKaydet() {
     hareketler.push(obj);
     // Satış kaydında ürün stoğundan düş
     if (tur === 'satis' && adet > 0 && !_cariHarId) {
+      if (!DB.urunStok) DB.urunStok = [];
+      if (!DB.urunHareketler) DB.urunHareketler = [];
       let kalanDus = adet;
       for (const u of DB.urunStok) {
         const mevcut = urunKalanStok(u.lot);
@@ -2346,7 +2397,8 @@ function ciKaydet() {
         kalanDus -= cikan;
         if (kalanDus <= 0) break;
       }
-      if (kalanDus > 0) toast('⚠️ Stok yetersiz! ' + kalanDus + ' bidon eksik — kısmi stok düşüldü.', 'warn');
+      if (kalanDus > 0) toast('⚠️ Stok yetersiz! ' + kalanDus + ' bidon eksik.', 'warn');
+      else toast('✅ Hareket kaydedildi — stoktan ' + adet + ' bidon düşüldü.', 'ok');
     }
   }
 
@@ -2389,6 +2441,16 @@ function cariHarSil(key, id) {
         (x.cariRef === key && Math.abs(x.tutar - har.tahsilat) < 0.01 && x.tarih === har.tarih)
       );
       if (kasaIdx > -1) DB.kasa.gelir.splice(kasaIdx, 1);
+    }
+
+    // Satış ise stok hareketlerinden de sil
+    if (har && har.tur === 'satis' && har.adet > 0) {
+      const cariAd = c.ad;
+      // Bu satışa ait stok çıkışlarını bul ve sil
+      DB.urunHareketler = DB.urunHareketler.filter(x =>
+        !(x.tip === 'cikis' && x.tarih === har.tarih &&
+          x.cari === cariAd && x.acik && x.acik.startsWith('SATIŞ'))
+      );
     }
 
     c.hareketler = c.hareketler.filter(h => h.id !== id);
@@ -2808,6 +2870,21 @@ function virmanKonuDeg() {
   virmanGuncelle();
 }
 
+/* ── MOBİL SIDEBAR ── */
+function sbToggle() {
+  document.getElementById('sb').classList.contains('acik') ? sbKapat() : sbAc();
+}
+function sbAc() {
+  document.getElementById('sb')?.classList.add('acik');
+  document.getElementById('sb-overlay')?.classList.add('acik');
+  document.body.style.overflow = 'hidden';
+}
+function sbKapat() {
+  document.getElementById('sb')?.classList.remove('acik');
+  document.getElementById('sb-overlay')?.classList.remove('acik');
+  document.body.style.overflow = '';
+}
+
 function tumBakiyeleriYenidenHesapla() {
   Object.values(DB.cariler).forEach(c => {
     c.hareketler = _bakiyeHesapla(c.hareketler);
@@ -3148,21 +3225,43 @@ function rOzet() {
 
   // ── TEK KAYNAK: DB.cariler[].hareketler ──
   let topSatis = 0, topTahsilat = 0, topBidon = 0;
-  const cariGrup = {}; // cari bazlı özet
+  let topBedelsiz = 0, topVirmanCikis = 0, topVirmanGiris = 0, topFazlaTahsilat = 0;
+  const cariGrup = {};
 
   Object.entries(DB.cariler).forEach(([k, c]) => {
     const bak = cariSonBakiye(k);
     let cSatis = 0, cTahsilat = 0, cAdet = 0;
     (c.hareketler || []).forEach(h => {
-      if (h.tur === 'satis') { cSatis += h.tutar||0; cAdet += h.adet||0; topBidon += h.adet||0; }
-      if (['tahsilat','iade_al','virman_giris'].includes(h.tur)) cTahsilat += h.tahsilat||0;
+      if (h.tur === 'satis')         { cSatis += h.tutar||0; cAdet += h.adet||0; topBidon += h.adet||0; }
+      if (h.tur === 'tahsilat')        cTahsilat += h.tahsilat||0;
+      if (h.tur === 'iade_al')         cTahsilat += h.tahsilat||0;
+      if (h.tur === 'bedelsiz_ver')    topBedelsiz   += h.tahsilat||0;
+      if (h.tur === 'virman_cikis')    topVirmanCikis += (h.tahsilat||h.tutar||0);
+      if (h.tur === 'virman_giris')    topVirmanGiris += (h.tutar||h.tahsilat||0);
     });
-    topSatis     += cSatis;
-    topTahsilat  += cTahsilat;
-    if (cSatis > 0 || cTahsilat > 0 || bak > 0) {
+    topSatis    += cSatis;
+    topTahsilat += cTahsilat;
+    if (bak < 0) topFazlaTahsilat += Math.abs(bak);
+    if (cSatis > 0 || cTahsilat > 0 || bak !== 0) {
       cariGrup[k] = { ad: c.ad, satis: cSatis, tahsilat: cTahsilat, adet: cAdet, kalan: bak };
     }
   });
+
+  const topKalanAlacak = topSatis - topTahsilat;
+  const aktifHesapSay  = Object.keys(DB.cariler).filter(k => cariSonBakiye(k) > 0).length;
+  const gercekAlacak   = Object.keys(DB.cariler).reduce((a,k) => a + Math.max(0, cariSonBakiye(k)), 0);
+  const fark           = topKalanAlacak - gercekAlacak;
+
+  // Fark kırılımı açıklaması
+  let farkAcik = aktifHesapSay + ' aktif hesap';
+  if (fark > 0) {
+    const kisimlar = [];
+    if (topBedelsiz   > 0) kisimlar.push('Bedelsiz: ₺' + fmtN(topBedelsiz));
+    if (topFazlaTahsilat > 0) kisimlar.push('Fazla tahsilat: ₺' + fmtN(topFazlaTahsilat));
+    const virmanNet = topVirmanCikis - topVirmanGiris;
+    if (Math.abs(virmanNet) > 0) kisimlar.push('Virman farkı: ₺' + fmtN(Math.abs(virmanNet)));
+    if (kisimlar.length) farkAcik = kisimlar.join(' · ');
+  }
 
   const mlG  = DB.marmaraLift.filter(x => x.tip === 'gider').reduce((a,x)=>a+(x.tutar||0),0);
   const mlGl = DB.marmaraLift.filter(x => x.tip === 'gelir').reduce((a,x)=>a+(x.tutar||0),0);
@@ -3170,7 +3269,6 @@ function rOzet() {
   const enT  = DB.enginTahsilat.reduce((a,x)=>a+(x.tutar||0),0);
   const kaG  = DB.kasa.gelir.reduce((a,x)=>a+(x.tutar||0),0);
   const kaC  = DB.kasa.gider.reduce((a,x)=>a+(x.tutar||0),0);
-  const topCariAlacak = Object.keys(DB.cariler).reduce((a,k)=>a+Math.max(0,cariSonBakiye(k)),0);
 
   const tBidon = DB.urunStok.reduce((a,u)=>a+urunKalanStok(u.lot),0);
   const tKg    = DB.urunStok.reduce((a,u)=>a+urunKalanStok(u.lot)*parseFloat(u.bidonBoy),0);
@@ -3179,7 +3277,10 @@ function rOzet() {
     <div class="sg">
       ${statCard('Toplam Satış', '₺'+fmt(topSatis), topBidon+' bidon', 'B')}
       ${statCard('Tahsil Edilen', '₺'+fmt(topTahsilat), '', 'G')}
-      ${statCard('Kalan Alacak', '₺'+fmt(topCariAlacak), Object.keys(DB.cariler).filter(k=>cariSonBakiye(k)>0).length+' aktif hesap', 'R')}
+      ${statCard('Kalan Alacak', '₺'+fmt(Math.abs(topKalanAlacak)),
+          topKalanAlacak > 0 ? farkAcik :
+          topKalanAlacak < 0 ? '⬇️ Fazla tahsilat var' : 'Tüm alacaklar tahsil edildi',
+          topKalanAlacak > 0 ? 'R' : topKalanAlacak < 0 ? 'B' : 'G')}
       ${statCard('ML Net Harcama', '₺'+fmt(mlG-mlGl), '', 'R')}
       ${statCard('Engin Bakiye', (enT-enH>=0?'+':'')+' ₺'+fmt(Math.abs(enT-enH)), enT-enH>=0?'Alacağımız':'Borcumuz', enT-enH>=0?'G':'R')}
       ${statCard('Kasa Bakiyesi', '₺'+fmt(kaG-kaC), 'Operasyonel', kaG-kaC>=0?'G':'R')}
@@ -3794,53 +3895,277 @@ function rKA() {
   const p = pg('kasa');
   const g = DB.kasa.gelir.reduce((a, x) => a + (x.tutar || 0), 0);
   const c = DB.kasa.gider.reduce((a, x) => a + (x.tutar || 0), 0);
+
+  // Tüm hareketleri birleştir ve tarihe göre sırala
+  const tumHar = [
+    ...DB.kasa.gelir.map(x => ({...x, yon:'giris'})),
+    ...DB.kasa.gider.map(x => ({...x, yon:'cikis'}))
+  ].sort((a,b) => (b.tarih||'').localeCompare(a.tarih||''));
+
+  // Kümülatif bakiye hesapla (kronolojik sırada)
+  const kronolojik = [...tumHar].reverse();
+  let cumBak = 0;
+  const bakiyeMap = new Map();
+  kronolojik.forEach(x => {
+    cumBak += x.yon === 'giris' ? (x.tutar||0) : -(x.tutar||0);
+    bakiyeMap.set(x.id + '_' + x.yon, cumBak);
+  });
+
+  const satirlar = tumHar.map(x => {
+    const giris = x.yon === 'giris';
+    const kaynak = x.cariRef ? `<span class="badge bB" style="font-size:9px">${DB.cariler[x.cariRef]?.ad?.split(' ')[0]||'Cari'}</span>` :
+                   x.enginRef ? `<span class="badge bP" style="font-size:9px">Engin</span>` :
+                   x.kisiRef  ? `<span class="badge bG" style="font-size:9px">${x.kisiRef}</span>` : '';
+    const bak = bakiyeMap.get(x.id + '_' + x.yon) || 0;
+    return `<tr>
+      <td class="tnw">${td(x.tarih)}</td>
+      <td>${giris ? badge('Giriş','bG') : badge('Çıkış','bR')}</td>
+      <td>${x.ad} ${kaynak}</td>
+      <td class="tr" style="font-weight:700;color:${giris?'var(--g)':'var(--r)'}">
+        ${giris?'+':'-'}₺${fmt(x.tutar)}
+      </td>
+      <td class="tr" style="font-size:11px;color:${bak>=0?'var(--g)':'var(--r)'}">
+        ₺${fmt(bak)}
+      </td>
+      <td><div class="td-actions">
+        <button class="btn xs te" onclick="${giris?'kaGAc':'kaCAc'}(${x.id})">✏️</button>
+        <button class="btn xs dn" onclick="${giris?'kaGSil':'kaCSil'}(${x.id})">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
   p.innerHTML = `
-    <div class="finfo" style="margin-bottom:14px">
-      💡 <b>Operasyonel Kasa</b> — günlük işletme nakit hareketleri.
-      Tüm kaynakların birleşik görünümü için
-      <span onclick="go('htum')" style="cursor:pointer;color:var(--b);font-weight:600;text-decoration:underline">🏦 Ana Kasa</span>'yı kullanın.
-    </div>
     <div class="sg">
-      ${statCard('Toplam Giriş', '₺' + fmt(g), 'Tahsilat + havale', 'G')}
-      ${statCard('Toplam Çıkış', '₺' + fmt(c), 'Ödemeler', 'R')}
-      ${statCard('Kasa Bakiyesi', '₺' + fmt(g - c), 'Net nakit', 'B')}
+      ${statCard('Kasa Bakiyesi', '₺'+fmt(g-c), 'Net nakit', g-c>=0?'G':'R')}
+      ${statCard('Toplam Giriş', '₺'+fmt(g), DB.kasa.gelir.length+' kayıt', 'G')}
+      ${statCard('Toplam Çıkış', '₺'+fmt(c), DB.kasa.gider.length+' kayıt', 'R')}
     </div>
-    <div class="twoC">
-      <div class="card">
-        <div class="ch">📥 Gelen / Kasa Girişi
-          <div class="ch-actions"><button class="btn xs gn" onclick="kaGAc(null)">+</button></div>
+
+    <div class="card">
+      <div class="ch">💰 Operasyonel Kasa Hareketleri
+        <div class="ch-actions" style="gap:6px">
+          <button class="btn xs gn" onclick="kasaTahsilatAc()">📥 Tahsilat Al</button>
+          <button class="btn xs dn" onclick="kasaOdemeAc()">📤 Ödeme Yap</button>
+          <button class="btn xs" onclick="kaGAc(null)">+ Genel Giriş</button>
+          <button class="btn xs" onclick="kaCAc(null)">+ Genel Çıkış</button>
         </div>
-        <div class="tw"><table>
-          <thead><tr><th>#</th><th>Açıklama</th><th>Tarih</th><th class="tr">Tutar</th><th></th></tr></thead>
-          <tbody>${DB.kasa.gelir.map((x, i) => `<tr>
-            <td>${i+1}</td><td>${x.ad}</td><td class="tnw">${td(x.tarih)}</td>
-            <td class="tr" style="color:var(--g);font-weight:600">₺${fmt(x.tutar)}</td>
-            <td><div class="td-actions">
-              <button class="btn xs te" onclick="kaGAc(${x.id})">✏️</button>
-              <button class="btn xs dn" onclick="kaGSil(${x.id})">🗑</button>
-            </div></td>
-          </tr>`).join('') || trEmpty(5)}</tbody>
-        </table></div>
-        <div style="padding:8px 14px;background:#fafaf8;border-top:1px solid var(--bdr);font-size:12px;font-weight:600;color:var(--g)">Toplam: ₺${fmt(g)}</div>
       </div>
-      <div class="card">
-        <div class="ch">📤 Ödenen / Çıkış
-          <div class="ch-actions"><button class="btn xs dn" onclick="kaCAc(null)">+</button></div>
-        </div>
-        <div class="tw"><table>
-          <thead><tr><th>#</th><th>Açıklama</th><th>Tarih</th><th class="tr">Tutar</th><th></th></tr></thead>
-          <tbody>${DB.kasa.gider.map((x, i) => `<tr>
-            <td>${i+1}</td><td>${x.ad}</td><td class="tnw">${td(x.tarih)}</td>
-            <td class="tr" style="color:var(--r);font-weight:600">₺${fmt(x.tutar)}</td>
-            <td><div class="td-actions">
-              <button class="btn xs te" onclick="kaCAc(${x.id})">✏️</button>
-              <button class="btn xs dn" onclick="kaCSil(${x.id})">🗑</button>
-            </div></td>
-          </tr>`).join('') || trEmpty(5)}</tbody>
-        </table></div>
-        <div style="padding:8px 14px;background:#fafaf8;border-top:1px solid var(--bdr);font-size:12px;font-weight:600;color:var(--r)">Toplam: ₺${fmt(c)}</div>
+      <div class="tw"><table>
+        <thead><tr><th>Tarih</th><th>Yön</th><th>Açıklama</th><th class="tr">Tutar</th><th class="tr">Bakiye</th><th></th></tr></thead>
+        <tbody>${satirlar || trEmpty(6,'Henüz kasa hareketi yok')}</tbody>
+      </table></div>
+      <div style="padding:9px 15px;background:var(--surf2);border-top:1px solid var(--bdr);font-size:12px">
+        Giriş: <b style="color:var(--g)">₺${fmt(g)}</b> &nbsp;|&nbsp;
+        Çıkış: <b style="color:var(--r)">₺${fmt(c)}</b> &nbsp;|&nbsp;
+        <b style="color:${g-c>=0?'var(--g)':'var(--r)'}">Bakiye: ₺${fmt(g-c)}</b>
       </div>
     </div>`;
+}
+
+// ── KASADAN TAHSİLAT AL (Cariden) ──
+function kasaTahsilatAc() {
+  const cariOpts = Object.entries(DB.cariler)
+    .filter(([k,c]) => cariSonBakiye(k) > 0)
+    .map(([k,c]) => `<option value="${k}">${c.ad} — Borç: ₺${fmt(cariSonBakiye(k))}</option>`)
+    .join('');
+
+  const body = `
+    <div class="fr"><label>Cari Hesap *</label>
+      <select id="kt-cari" onchange="ktCariSec()">
+        <option value="">— Cari seçin —</option>
+        ${cariOpts}
+      </select>
+    </div>
+    <div id="kt-cari-bilgi" style="margin:8px 0"></div>
+    <div class="fg2">
+      <div class="fr"><label>Tarih</label>
+        <input id="kt-tarih" type="date" value="${today()}">
+      </div>
+      <div class="fr"><label>Tahsilat Tutarı (₺) *</label>
+        <input id="kt-tutar" type="number" value="0" min="0" step="0.01" oninput="ktTutarDeg()">
+      </div>
+    </div>
+    <div class="fr"><label>Açıklama</label>
+      <input id="kt-acik" type="text" placeholder="ör: Nakit tahsilat, havale...">
+    </div>
+    <div id="kt-sonuc" style="margin-top:8px"></div>`;
+
+  modalOlustur('mo-kt', '📥 Cariden Tahsilat Al', body,
+    `<button class="btn" onclick="mKapat('mo-kt')">İptal</button>
+     <button class="btn gn" onclick="kasaTahsilatKaydet()">📥 Tahsilat Al</button>`, 'w');
+  mAc('mo-kt');
+}
+
+function ktCariSec() {
+  const key = fVal('kt-cari');
+  const el  = document.getElementById('kt-cari-bilgi');
+  if (!key || !el) return;
+  const bak = cariSonBakiye(key);
+  const c   = DB.cariler[key];
+  el.innerHTML = `<div class="finfo">
+    <b>${c.ad}</b> — Mevcut borç: <b style="color:var(--r)">₺${fmt(bak)}</b>
+  </div>`;
+  const tutEl = document.getElementById('kt-tutar');
+  if (tutEl) tutEl.value = bak.toFixed(2);
+  ktTutarDeg();
+}
+
+function ktTutarDeg() {
+  const key   = fVal('kt-cari');
+  const tutar = fNum('kt-tutar');
+  const bak   = key ? cariSonBakiye(key) : 0;
+  const el    = document.getElementById('kt-sonuc');
+  if (!el) return;
+  if (tutar > bak) {
+    el.innerHTML = `<div class="fwarn">⚠️ Girilen tutar (₺${fmt(tutar)}) borçtan (₺${fmt(bak)}) fazla — müşteri alacaklı olur.</div>`;
+  } else if (tutar === bak) {
+    el.innerHTML = `<div class="fsuccess">✅ Bakiye tamamen kapatılıyor.</div>`;
+  } else if (tutar > 0) {
+    el.innerHTML = `<div class="finfo">Tahsilat sonrası kalan borç: ₺${fmt(bak - tutar)}</div>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+function kasaTahsilatKaydet() {
+  const key   = fVal('kt-cari');
+  const tutar = fNum('kt-tutar');
+  const tarih = fVal('kt-tarih');
+  const acik  = fVal('kt-acik');
+  if (!key)   { toast('Cari seçin!', 'err'); return; }
+  if (!tutar) { toast('Tutar girin!', 'err'); return; }
+  const c = DB.cariler[key];
+
+  // 1. Kasaya giriş ekle
+  const kasaId = nid('kag');
+  DB.kasa.gelir.push({
+    id: kasaId, tarih,
+    ad: c.ad + ' TAHSİLAT' + (acik ? ' — ' + acik : ''),
+    tutar, cariRef: key
+  });
+
+  // 2. Cari hareketine tahsilat ekle
+  const harId = nid('ci');
+  const har = {
+    id: harId, tarih, tur: 'tahsilat',
+    fatno: '', adet: 0, birim: 0, tutar: 0,
+    tahsilat: tutar, bakiye: 0,
+    acik: 'Kasa tahsilatı' + (acik ? ' — ' + acik : ''),
+    kasaId
+  };
+  c.hareketler.push(har);
+  c.hareketler = _bakiyeHesapla(c.hareketler);
+
+  mKapat('mo-kt');
+  dbKaydet();
+  cariNavGuncelle();
+  rKA();
+  toast(`✅ ₺${fmt(tutar)} tahsilat alındı — ${c.ad} bakiyesi güncellendi`, 'ok');
+}
+
+// ── KASADAN ÖDEME YAP ──
+function kasaOdemeAc() {
+  const kasaBak = DB.kasa.gelir.reduce((a,x)=>a+(x.tutar||0),0)
+                - DB.kasa.gider.reduce((a,x)=>a+(x.tutar||0),0);
+
+  // Ödeme hedefleri: Engin, cariler, serbest
+  const body = `
+    <div class="finfo" style="margin-bottom:10px">
+      Kasa bakiyesi: <b style="color:${kasaBak>=0?'var(--g)':'var(--r)'}">₺${fmt(kasaBak)}</b>
+    </div>
+    <div class="fr"><label>Ödeme Türü *</label>
+      <select id="ko-tur" onchange="koTurDeg()">
+        <option value="serbest">Serbest Ödeme (kişi/kurum/fatura)</option>
+        <option value="engin">Engin Hesabına Ödeme</option>
+        <option value="cari">Cariye Ödeme / İade</option>
+      </select>
+    </div>
+    <div id="ko-tur-alan" style="margin-top:8px"></div>
+    <div class="fg2" style="margin-top:8px">
+      <div class="fr"><label>Tarih</label>
+        <input id="ko-tarih" type="date" value="${today()}">
+      </div>
+      <div class="fr"><label>Tutar (₺) *</label>
+        <input id="ko-tutar" type="number" value="0" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="fr"><label>Açıklama *</label>
+      <input id="ko-acik" type="text" placeholder="ör: Elektrik faturası, kira, maaş...">
+    </div>`;
+
+  modalOlustur('mo-ko', '📤 Kasadan Ödeme Yap', body,
+    `<button class="btn" onclick="mKapat('mo-ko')">İptal</button>
+     <button class="btn dn" onclick="kasaOdemeKaydet()">📤 Ödeme Yap</button>`, 'w');
+  mAc('mo-ko');
+  koTurDeg();
+}
+
+function koTurDeg() {
+  const tur = fVal('ko-tur');
+  const el  = document.getElementById('ko-tur-alan');
+  if (!el) return;
+
+  if (tur === 'engin') {
+    el.innerHTML = `<div class="finfo">Ödeme Engin hesabına işlenecek (Engin Tahsilat olarak).</div>`;
+  } else if (tur === 'cari') {
+    const cariOpts = Object.entries(DB.cariler)
+      .map(([k,c]) => `<option value="${k}">${c.ad}</option>`).join('');
+    el.innerHTML = `<div class="fr"><label>Cari Hesap</label>
+      <select id="ko-cari"><option value="">— Cari seçin —</option>${cariOpts}</select>
+    </div>`;
+  } else {
+    el.innerHTML = `<div class="finfo">Ödeme kasadan çıkış olarak kaydedilecek. Açıklama kısmına kişi/kurum adını yazın.</div>`;
+  }
+}
+
+function kasaOdemeKaydet() {
+  const tur   = fVal('ko-tur');
+  const tutar = fNum('ko-tutar');
+  const tarih = fVal('ko-tarih');
+  const acik  = fVal('ko-acik').trim();
+  if (!tutar) { toast('Tutar girin!', 'err'); return; }
+  if (!acik && tur === 'serbest') { toast('Açıklama zorunlu!', 'err'); return; }
+
+  const kasaId = nid('kac');
+
+  // 1. Kasadan çıkış
+  DB.kasa.gider.push({ id: kasaId, tarih, ad: acik || 'Ödeme', tutar });
+
+  // 2. Tur'a göre ek işlem
+  if (tur === 'engin') {
+    // Engin hesabına tahsilat olarak ekle
+    DB.enginTahsilat.push({
+      id: nid('ent'), tarih,
+      ad: 'Kasa Ödemesi' + (acik ? ' — ' + acik : ''),
+      tutar, kasaRef: kasaId
+    });
+    toast(`✅ ₺${fmt(tutar)} Engin hesabına işlendi`, 'ok');
+
+  } else if (tur === 'cari') {
+    // Cariye iade/ödeme
+    const key = fVal('ko-cari');
+    if (!key) { toast('Cari seçin!', 'err'); DB.kasa.gider.pop(); return; }
+    const c = DB.cariler[key];
+    const harId = nid('ci');
+    c.hareketler.push({
+      id: harId, tarih, tur: 'iade_al',
+      fatno:'', adet:0, birim:0, tutar:0,
+      tahsilat: tutar, bakiye:0,
+      acik: 'Kasa ödemesi' + (acik ? ' — ' + acik : ''),
+      kasaId
+    });
+    c.hareketler = _bakiyeHesapla(c.hareketler);
+    cariNavGuncelle();
+    toast(`✅ ₺${fmt(tutar)} ${c.ad} hesabına işlendi`, 'ok');
+
+  } else {
+    // Serbest ödeme
+    toast(`✅ ₺${fmt(tutar)} ödeme kaydedildi: ${acik}`, 'ok');
+  }
+
+  mKapat('mo-ko');
+  dbKaydet();
+  rKA();
 }
 
 let _kaGCtx = null, _kaCCtx = null;
@@ -4158,6 +4483,7 @@ function rHMM() {
   p.innerHTML = `
     <div class="tb" style="background:transparent;border:none;padding:0;margin-bottom:14px;flex-wrap:wrap;gap:8px">
       <button class="btn pr" onclick="hmAlAc(null, null)">+ Hammadde Alımı</button>
+      <button class="btn gn" onclick="yeniHammaddeAc()">+ Yeni Hammadde Tanımla</button>
       <button class="btn am" onclick="hmCikAc()">+ Manuel Çıkış</button>
     </div>
     ${Object.entries(DB.hammadde).map(([k, h]) => hmmSectionHTML(k, h)).join('')}`;
@@ -4173,6 +4499,9 @@ function hmmSectionHTML(k, h) {
       <div style="width:10px;height:10px;border-radius:50%;background:${h.renk};flex-shrink:0"></div>
       <span style="font-weight:600;font-size:13px">${h.ad}</span>
       <span style="margin-left:auto;font-size:17px;font-weight:700;color:${h.renk}">${h.guncel} ${h.birim}</span>
+      <button class="btn xs te" onclick="hammaddeDuzenleAc('${k}')" title="Hammadde Düzenle" style="margin-left:8px">✏️</button>
+      <button class="btn xs" onclick="hammaddeGuncelStokAc('${k}')" title="Stok Düzelt" style="margin-left:4px">📦</button>
+      <button class="btn xs dn" onclick="hammaddeSil('${k}')" title="Hammaddeyi Sil" style="margin-left:4px">🗑</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr)">
       <div style="padding:9px 13px;border-right:1px solid var(--bdr)">
@@ -4428,6 +4757,205 @@ function hmalKaydet() {
     toast('✅ Hammadde alımı kaydedildi', 'ok');
   }
   mKapat('mo-hmal'); dbKaydet(); rHMM();
+}
+
+function hammaddeDuzenleAc(key) {
+  const h = DB.hammadde[key];
+  if (!h) return;
+  const body = `
+    <div class="fg2">
+      <div class="fr"><label>Hammadde Adı *</label>
+        <input id="hdz-ad" type="text" value="${h.ad}">
+      </div>
+      <div class="fr"><label>Birim</label>
+        <select id="hdz-birim">
+          <option value="kg" ${h.birim==='kg'?'selected':''}>kg</option>
+          <option value="lt" ${h.birim==='lt'?'selected':''}>litre</option>
+          <option value="adet" ${h.birim==='adet'?'selected':''}>adet</option>
+          <option value="ton" ${h.birim==='ton'?'selected':''}>ton</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg2">
+      <div class="fr"><label>Renk</label>
+        <input id="hdz-renk" type="color" value="${h.renk||'#2563eb'}" style="height:36px;padding:2px 4px;cursor:pointer">
+      </div>
+      <div class="fr"><label>Açıklama</label>
+        <input id="hdz-acik" type="text" value="${h.acik||''}" placeholder="Opsiyonel">
+      </div>
+    </div>`;
+  modalOlustur('mo-hdz', '✏️ Hammadde Düzenle — ' + h.ad, body,
+    `<button class="btn" onclick="mKapat('mo-hdz')">İptal</button>
+     <button class="btn pr" onclick="hammaddeDuzenleKaydet('${key}')">💾 Kaydet</button>`, 'w');
+  mAc('mo-hdz');
+}
+
+function hammaddeDuzenleKaydet(key) {
+  const h = DB.hammadde[key];
+  if (!h) return;
+  const ad = fVal('hdz-ad').trim();
+  if (!ad) { toast('Ad zorunlu!', 'err'); return; }
+  h.ad    = ad;
+  h.birim = fVal('hdz-birim');
+  h.renk  = fVal('hdz-renk');
+  h.acik  = fVal('hdz-acik');
+  mKapat('mo-hdz');
+  dbKaydet();
+  rHMM();
+  toast('✅ ' + ad + ' güncellendi', 'ok');
+}
+
+function hammaddeGuncelStokAc(key) {
+  const h = DB.hammadde[key];
+  if (!h) return;
+  const body = `
+    <div class="finfo" style="margin-bottom:12px">
+      Mevcut kayıtlı stok: <b>${h.guncel} ${h.birim}</b>
+    </div>
+    <div class="fg2">
+      <div class="fr"><label>Yeni Başlangıç Stoku (${h.birim}) *</label>
+        <input id="hgs-miktar" type="number" value="${h.guncel}" min="0" step="0.01" onfocus="this.select()">
+      </div>
+      <div class="fr"><label>Giriş Tarihi</label>
+        <input id="hgs-tarih" type="date" value="${today()}">
+      </div>
+    </div>
+    <div class="fg2">
+      <div class="fr"><label>Birim Fiyat (₺/${h.birim})</label>
+        <input id="hgs-birimf" type="number" value="0" min="0" step="0.01" placeholder="Maliyet bilinmiyorsa 0">
+      </div>
+      <div class="fr"><label>Tedarikçi</label>
+        <input id="hgs-cari" type="text" placeholder="ör: Açılış stoğu">
+      </div>
+    </div>
+    <div class="fr"><label>Açıklama / Neden</label>
+      <input id="hgs-neden" type="text" placeholder="ör: Açılış stoğu, sayım düzeltmesi..." value="Açılış stoğu">
+    </div>
+    <div class="fwarn" style="margin-top:10px;font-size:11px">
+      ⚠️ Mevcut stok sıfırlanıp bu değer alım kaydı olarak eklenecek. Eski kayıtlar silinmez.
+    </div>`;
+  modalOlustur('mo-hgs', '📦 Başlangıç Stoğu Düzelt — ' + h.ad, body,
+    `<button class="btn" onclick="mKapat('mo-hgs')">İptal</button>
+     <button class="btn pr" onclick="hammaddeStokKaydet('${key}')">💾 Kaydet</button>`, 'w');
+  mAc('mo-hgs');
+}
+
+function hammaddeStokKaydet(key) {
+  const h = DB.hammadde[key];
+  if (!h) return;
+  const yeniStok = fNum('hgs-miktar');
+  const tarih    = fVal('hgs-tarih') || today();
+  const birimF   = fNum('hgs-birimf');
+  const cari     = fVal('hgs-cari') || 'Açılış stoğu';
+  const neden    = fVal('hgs-neden') || 'Açılış stoğu';
+  const tutar    = yeniStok * birimF;
+
+  // Daha önce eklenen açılış/düzeltme kayıtlarını temizle
+  h.alimlar  = h.alimlar.filter(a => a.cari !== 'Açılış stoğu' && a.cari !== 'Düzeltme');
+  h.cikislar = h.cikislar.filter(c => c.neden !== 'Düzeltme');
+
+  // Yeni başlangıç alım kaydı ekle
+  h.alimlar.push({
+    id: nid('hmid'), tarih, cari, miktar: yeniStok,
+    birimF, tutar, fatno: '', vade: '', odeme: '',
+    ek: 0, not: neden
+  });
+
+  // Marmara Lift maliyet (fiyat girilmişse)
+  if (tutar > 0) {
+    // Eski açılış kaydını temizle
+    DB.marmaraLift = DB.marmaraLift.filter(m =>
+      !(m.kat === 'HAMMADDE' && m.ad && m.ad.includes(h.ad) && m.ad.includes('Açılış'))
+    );
+    DB.marmaraLift.push({
+      id: nid('ml'), tarih, tip: 'gider',
+      ad: h.ad + ' Açılış Stoğu — ' + cari,
+      tutar, kat: 'HAMMADDE',
+      not: yeniStok + ' ' + h.birim + ' × ₺' + birimF
+    });
+  }
+
+  // Stok: alımlar toplamı - çıkışlar toplamı
+  const topAlim  = h.alimlar.reduce((s, a) => s + (a.miktar || 0), 0);
+  const topCikis = h.cikislar.reduce((s, c) => s + (c.miktar || 0), 0);
+  h.guncel = Math.max(0, topAlim - topCikis);
+
+  mKapat('mo-hgs');
+  dbKaydet();
+  rHMM();
+  toast('✅ ' + h.ad + ': ' + h.guncel + ' ' + h.birim + ' — ₺' + fmt(tutar) + ' maliyet yansıtıldı', 'ok');
+}
+
+function hammaddeSil(key) {
+  const h = DB.hammadde[key];
+  if (!h) return;
+  konfirm('Hammadde Sil', `"${h.ad}" ve tüm kayıtları silinsin mi? Bu işlem geri alınamaz!`, () => {
+    delete DB.hammadde[key];
+    dbKaydet();
+    rHMM();
+    toast('🗑 ' + h.ad + ' silindi');
+  });
+}
+
+function yeniHammaddeAc() {
+  const body = `
+    <div class="fg2">
+      <div class="fr"><label>Hammadde Adı *</label>
+        <input id="nhm-ad" type="text" placeholder="ör: Sodyum Hipoklorit">
+      </div>
+      <div class="fr"><label>Kısa Kod *</label>
+        <input id="nhm-key" type="text" placeholder="ör: HIPOKLORIT (büyük harf, boşluksuz)" style="text-transform:uppercase">
+      </div>
+    </div>
+    <div class="fg2">
+      <div class="fr"><label>Birim *</label>
+        <select id="nhm-birim">
+          <option value="kg">kg</option>
+          <option value="lt">litre</option>
+          <option value="adet">adet</option>
+          <option value="ton">ton</option>
+        </select>
+      </div>
+      <div class="fr"><label>Renk</label>
+        <input id="nhm-renk" type="color" value="#2563eb" style="height:36px;padding:2px 4px;cursor:pointer">
+      </div>
+    </div>
+    <div class="fg2">
+      <div class="fr"><label>Başlangıç Stoku</label>
+        <input id="nhm-guncel" type="number" value="0" min="0" step="0.01">
+      </div>
+      <div class="fr"><label>Açıklama</label>
+        <input id="nhm-acik" type="text" placeholder="Opsiyonel not">
+      </div>
+    </div>`;
+
+  modalOlustur('mo-nhm', '➕ Yeni Hammadde Tanımla', body,
+    `<button class="btn" onclick="mKapat('mo-nhm')">İptal</button>
+     <button class="btn pr" onclick="yeniHammaddeKaydet()">💾 Kaydet</button>`, 'w');
+  mAc('mo-nhm');
+}
+
+function yeniHammaddeKaydet() {
+  const ad    = fVal('nhm-ad').trim();
+  const key   = fVal('nhm-key').trim().toUpperCase().replace(/\s+/g, '_');
+  const birim = fVal('nhm-birim');
+  const renk  = fVal('nhm-renk');
+  const guncel = fNum('nhm-guncel');
+
+  if (!ad)  { toast('Hammadde adı zorunlu!', 'err'); return; }
+  if (!key) { toast('Kısa kod zorunlu!', 'err'); return; }
+  if (DB.hammadde[key]) { toast('Bu kod zaten var: ' + key, 'err'); return; }
+
+  DB.hammadde[key] = {
+    ad, birim, renk, guncel,
+    alimlar: [],
+    cikislar: []
+  };
+
+  mKapat('mo-nhm');
+  dbKaydet();
+  rHMM();
+  toast('✅ ' + ad + ' eklendi', 'ok');
 }
 
 function hmAlSil(k, id) {
@@ -5076,16 +5604,15 @@ function uyBidonEkle() {
   const div = document.createElement('div');
   div.id = 'ub-' + id;
   div.className = 'uy-bidon-row';
-  const boyOpts = BIDON_BOYUTLAR.map(b => `<option value="${b}">${b} lt</option>`).join('') +
-    `<option value="diger">Diğer (Manuel)</option>`;
+  const boyOpts = bidonBoyOpts('');
   div.innerHTML = `
-    <div class="fr" style="margin-bottom:0"><label>Bidon Ebatı</label>
+    <div class="fr" style="margin-bottom:0"><label>Ambalaj Tipi</label>
       <select id="ubs-${id}" onchange="ubEbatDeg(${id});uyBidonOzetGoster()">
         ${boyOpts}
       </select>
     </div>
-    <div class="fr" id="ub-manuel-${id}" style="margin-bottom:0;display:none"><label>Ebat (lt)</label>
-      <input id="ubm-${id}" type="number" value="" min="0.1" step="0.1" placeholder="ör: 15" oninput="ubHspl(${id});uyBidonOzetGoster()" onfocus="this.select()">
+    <div class="fr" id="ub-manuel-${id}" style="margin-bottom:0;display:none"><label>Miktar / Ebat</label>
+      <input id="ubm-${id}" type="number" value="" min="0.1" step="0.1" placeholder="ör: 1000 (lt veya kg)" oninput="ubHspl(${id});uyBidonOzetGoster()" onfocus="this.select()">
     </div>
     <div class="fr" style="margin-bottom:0"><label>Adet</label>
       <input id="uba-${id}" type="number" value="" min="0" placeholder="0" oninput="ubHspl(${id});uyBidonOzetGoster()" onfocus="this.select()">
@@ -5101,7 +5628,15 @@ function ubEbatDeg(id) {
   const sel = document.getElementById('ubs-' + id);
   const manuelDiv = document.getElementById('ub-manuel-' + id);
   if (sel && manuelDiv) {
-    manuelDiv.style.display = sel.value === 'diger' ? 'block' : 'none';
+    const manuelGerekenler = ['diger', 'litre', 'ibc'];
+    manuelDiv.style.display = manuelGerekenler.includes(sel.value) ? 'block' : 'none';
+    // Label güncelle
+    const manuelLabel = manuelDiv.querySelector('label');
+    if (manuelLabel) {
+      if (sel.value === 'litre')  manuelLabel.textContent = 'Miktar (Litre)';
+      else if (sel.value === 'ibc') manuelLabel.textContent = 'IBC Hacim (Lt)';
+      else manuelLabel.textContent = 'Ebat (lt)';
+    }
   }
   ubHspl(id);
 }
@@ -5329,8 +5864,42 @@ function urDuzenleSave() {
 }
 
 function urSil(id) {
-  konfirm('Üretim Sil', 'Bu üretim kaydı silinsin mi? Stok ve hammadde değişmez.', () => {
-    DB.uretimKayitlari = DB.uretimKayitlari.filter(r => r.id !== id); dbKaydet(); rUR();
+  const u = DB.uretimKayitlari.find(r => r.id === id);
+  if (!u) return;
+
+  const geriYuklenecek = [];
+  if (u.hammaddeler) {
+    Object.entries(u.hammaddeler).forEach(([k, m]) => {
+      if (DB.hammadde[k]) geriYuklenecek.push(`${DB.hammadde[k].ad}: ${m} kg`);
+    });
+  }
+
+  konfirm('Üretim Sil',
+    `"${u.lot}" — ${u.urun} silinsin mi?\n\nHammadde stokları geri yüklenecek:\n${geriYuklenecek.join('\n') || '—'}`, () => {
+    otoyedekAl('Üretim silme: ' + u.lot);
+
+    // Hammadde stoğunu geri yükle
+    if (u.hammaddeler) {
+      Object.entries(u.hammaddeler).forEach(([k, m]) => {
+        if (DB.hammadde[k] && m > 0) {
+          DB.hammadde[k].guncel += m;
+          DB.hammadde[k].cikislar = DB.hammadde[k].cikislar.filter(
+            c => !(c.neden === 'uretim' && c.not && c.not.includes(u.lot))
+          );
+        }
+      });
+    }
+
+    // Ürün stok ve hareketlerinden sil
+    DB.urunStok = DB.urunStok.filter(s => s.lot !== u.lot);
+    DB.urunHareketler = DB.urunHareketler.filter(h =>
+      !(h.lot === u.lot && h.tip === 'giris')
+    );
+
+    DB.uretimKayitlari = DB.uretimKayitlari.filter(r => r.id !== id);
+    dbKaydet();
+    rUR();
+    toast('🗑 Üretim silindi — hammadde stokları geri yüklendi');
   });
 }
 
@@ -5343,12 +5912,34 @@ function rMAL() {
   const tB = DB.uretimKayitlari.reduce((a, u) => a + (u.bidonlar||[]).reduce((b,x)=>b+(x.adet||0),0), 0);
   const topGider = DB.genelGiderler.reduce((a, g) => a + (g.tutar || 0), 0);
 
+  // Stokta olan ama maliyet kaydı olmayan lotları bul
+  const kayitliLotlar = new Set(DB.uretimKayitlari.map(u => u.lot));
+  const stokLotlar = [...new Set(DB.urunStok.map(u => u.lot))];
+  const kayipLotlar = stokLotlar.filter(l => !kayitliLotlar.has(l));
+
+  const kayipUyari = kayipLotlar.length ? `
+    <div class="fwarn" style="margin-bottom:12px">
+      ⚠️ Maliyet kaydı olmayan ${kayipLotlar.length} lot bulundu:
+      ${kayipLotlar.map(l => {
+        const stok = DB.urunStok.filter(u => u.lot === l);
+        const topBidon = stok.reduce((a,u) => a+(u.bidonAdet||0), 0);
+        const topKg    = stok.reduce((a,u) => a+(u.kg||0), 0);
+        const urun     = stok[0]?.ad || '';
+        const tarih    = stok[0]?.uretimTarih || '';
+        return `<button class="btn xs te" onclick="kayipLotMaliyetEkle('${l}')"
+          style="margin:3px" title="${topBidon} bidon · ${topKg} kg">
+          📋 ${l} — ${urun} (${topBidon} bidon)
+        </button>`;
+      }).join('')}
+    </div>` : '';
+
   p.innerHTML = `
+    ${kayipUyari}
     <div class="sg">
-      ${statCard('Hammadde Maliyeti', '&#8378;'+fmt(tM), 'Tum uretimler', 'R')}
-      ${statCard('Genel Giderler (Aylik)', '&#8378;'+fmt(topGider), DB.genelGiderler.length+' kalem', 'A')}
-      ${statCard('Toplam Uretilen', tK+' kg', tB+' bidon', 'G')}
-      ${statCard('Ort. Ham. Maliyet/kg', tK>0?'&#8378;'+fmt(tM/tK):'--', '', 'B')}
+      ${statCard('Hammadde Maliyeti', '₺'+fmt(tM), 'Tüm üretimler', 'R')}
+      ${statCard('Genel Giderler (Aylık)', '₺'+fmt(topGider), DB.genelGiderler.length+' kalem', 'A')}
+      ${statCard('Toplam Üretilen', tK+' kg', tB+' bidon', 'G')}
+      ${statCard('Ort. Ham. Maliyet/kg', tK>0?'₺'+fmt(tM/tK):'--', '', 'B')}
     </div>
 
     <div class="card">
@@ -5418,16 +6009,207 @@ function rMAL() {
 
 function genelGiderEkle() { genelGiderDuz(null); }
 
-function lotMaliyetSil(id) {
-  konfirm('Lot Maliyet Sil', 'Bu lot maliyet kaydı silinsin mi? Hammadde ve üretim hareketleri etkilenmez.', () => {
-    // Lot kaydını sil
-    const idx = DB.uretimKayitlari.findIndex(u => u.id === id);
-    if (idx > -1) {
-      DB.uretimKayitlari.splice(idx, 1);
+function kayipLotMaliyetEkle(lot) {
+  // Stoktan bilgileri al
+  const stok = DB.urunStok.filter(u => u.lot === lot);
+  const urun  = stok[0]?.ad || '';
+  const tarih = stok[0]?.uretimTarih || today();
+  const topKg = stok.reduce((a,u) => a+(u.kg||0), 0);
+  const bidonlar = stok.map(u => ({ boy: u.bidonBoy||'', adet: u.bidonAdet||0 }));
+
+  // Hammadde satırları — DB.hammadde'den tanımlı hammaddeleri listele
+  const hmOpts = Object.entries(DB.hammadde).map(([k,h]) =>
+    `<option value="${k}">${h.ad}</option>`
+  ).join('');
+
+  const body = `
+    <div class="finfo" style="margin-bottom:10px">
+      <b>${lot}</b> — ${urun}<br>
+      <span style="font-size:11px;color:var(--tx2)">
+        ${bidonlar.map(b => b.adet+'×'+b.boy+'lt').join(', ')} · ${topKg} kg
+      </span>
+    </div>
+    <div class="fg2">
+      <div class="fr"><label>Üretim Tarihi</label>
+        <input id="klm-tarih" type="date" value="${tarih}">
+      </div>
+      <div class="fr"><label>Ürün Adı</label>
+        <input id="klm-urun" type="text" value="${urun}">
+      </div>
+    </div>
+
+    <div style="margin-top:10px;padding:10px;background:var(--surf2);border-radius:var(--ra)">
+      <div style="font-weight:600;font-size:12px;margin-bottom:8px">
+        🧪 Hammadde Maliyetleri
+        <span style="font-size:10px;color:var(--tx2);font-weight:400;margin-left:6px">Miktar × Birim Fiyat = Maliyet</span>
+      </div>
+      <div style="display:flex;gap:6px;font-size:10px;color:var(--tx2);margin-bottom:4px;padding:0 2px">
+        <span style="flex:1">Hammadde</span>
+        <span style="width:100px">Miktar (kg)</span>
+        <span style="width:90px">₺/kg</span>
+        <span style="width:90px">Tutar</span>
+        <span style="width:28px"></span>
+      </div>
+      <div id="klm-satirlar"></div>
+      <button class="btn xs" onclick="klmSatirEkle()" style="margin-top:6px">+ Hammadde Ekle</button>
+    </div>
+
+    <div class="fg2" style="margin-top:10px">
+      <div class="fr"><label>Toplam Hammadde Maliyeti (₺)</label>
+        <input id="klm-maliyet" type="number" value="0" min="0" step="0.01" oninput="klmGuncelle()">
+      </div>
+      <div class="fr"><label>Toplam Kg</label>
+        <input id="klm-kg" type="number" value="${topKg}" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="fsuccess" id="klm-sonuc" style="margin-top:8px"></div>`;
+
+  modalOlustur('mo-klm', '📋 Maliyet Kaydı Ekle — ' + lot, body,
+    `<button class="btn" onclick="mKapat('mo-klm')">İptal</button>
+     <button class="btn pr" onclick="kayipLotKaydet('${lot}')">💾 Maliyet Kaydet</button>`, 'xl');
+  mAc('mo-klm');
+
+  // İlk satırı otomatik ekle
+  setTimeout(() => {
+    klmSatirEkle();
+    klmSatirEkle();
+  }, 100);
+}
+
+function klmSatirEkle() {
+  const div = document.getElementById('klm-satirlar');
+  if (!div) return;
+  const i = div.children.length;
+  const hmOpts = Object.entries(DB.hammadde).map(([k,h]) =>
+    `<option value="${k}">${h.ad}</option>`
+  ).join('');
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:6px';
+  row.innerHTML = `
+    <select id="klm-hm-${i}" style="flex:1" onchange="klmBirimDoldur(${i})">
+      <option value="">— Hammadde seç —</option>
+      ${hmOpts}
+    </select>
+    <input type="number" id="klm-mik-${i}" placeholder="kg" style="width:100px" min="0" step="0.01" oninput="klmHesapla(${i})">
+    <input type="number" id="klm-fiy-${i}" placeholder="₺/kg" style="width:90px" min="0" step="0.01" oninput="klmHesapla(${i})">
+    <input type="number" id="klm-tut-${i}" placeholder="₺" style="width:90px;background:var(--surf2)" readonly>
+    <button class="btn xs dn" onclick="this.closest('div').remove();klmToplamGuncelle()" style="padding:3px 7px">✕</button>`;
+  div.appendChild(row);
+}
+
+function klmBirimDoldur(i) {
+  const key = document.getElementById('klm-hm-' + i)?.value;
+  if (!key || !DB.hammadde[key]) return;
+  const birimF = hammaddeOrtBirim(key);
+  if (birimF > 0) {
+    const fiyEl = document.getElementById('klm-fiy-' + i);
+    if (fiyEl) { fiyEl.value = birimF.toFixed(2); klmHesapla(i); }
+  }
+}
+
+function klmHesapla(i) {
+  const mik = parseFloat(document.getElementById('klm-mik-' + i)?.value) || 0;
+  const fiy = parseFloat(document.getElementById('klm-fiy-' + i)?.value) || 0;
+  const tutEl = document.getElementById('klm-tut-' + i);
+  if (tutEl) tutEl.value = (mik * fiy).toFixed(2);
+  klmToplamGuncelle();
+}
+
+function klmToplamGuncelle() {
+  let top = 0;
+  document.querySelectorAll('[id^="klm-tut-"]').forEach(el => {
+    top += parseFloat(el.value) || 0;
+  });
+  const malEl = document.getElementById('klm-maliyet');
+  if (malEl) malEl.value = top.toFixed(2);
+  klmGuncelle();
+}
+
+function klmGuncelle() {
+  const mal = parseFloat(document.getElementById('klm-maliyet')?.value) || 0;
+  const kg  = parseFloat(document.getElementById('klm-kg')?.value) || 0;
+  const el  = document.getElementById('klm-sonuc');
+  if (el) el.innerHTML = `Toplam: <b>₺${fmt(mal)}</b> · <b>₺${fmt(kg>0?mal/kg:0)}/kg</b>`;
+}
+
+function kayipLotKaydet(lot) {
+  const stok = DB.urunStok.filter(u => u.lot === lot);
+  const tarih  = fVal('klm-tarih') || stok[0]?.uretimTarih || today();
+  const urun   = fVal('klm-urun') || stok[0]?.ad || '';
+  const maliyet= fNum('klm-maliyet');
+  const topKg  = fNum('klm-kg') || stok.reduce((a,u)=>a+(u.kg||0),0);
+  const bidonlar = stok.map(u => ({ boy: u.bidonBoy||'', adet: u.bidonAdet||0 }));
+
+  // Hammadde verisini topla
+  const hammaddeler = {};
+  const recete = [];
+  document.querySelectorAll('[id^="klm-hm-"]').forEach(el => {
+    const i   = el.id.split('-').pop();
+    const key = el.value;
+    const mik = parseFloat(document.getElementById('klm-mik-' + i)?.value) || 0;
+    const fiy = parseFloat(document.getElementById('klm-fiy-' + i)?.value) || 0;
+    if (key && mik > 0) {
+      hammaddeler[key] = (hammaddeler[key]||0) + mik;
+      recete.push({ hmAd: DB.hammadde[key]?.ad||key, miktar: mik, birimF: fiy, tutar: mik*fiy });
     }
-    // urunStok'tan da kaldır
-    DB.urunStok = DB.urunStok.filter(u => u.id !== id);
-    dbKaydet(); rMAL(); toast('🗑 Lot maliyet kaydı silindi');
+  });
+
+  DB.uretimKayitlari.push({
+    id: nid('ur'), tarih, lot, urun,
+    hammaddeler, recete, bidonlar,
+    toplamKg: topKg, maliyet, genelGiderPayi: 0, not: 'Yeniden oluşturuldu'
+  });
+
+  mKapat('mo-klm');
+  dbKaydet();
+  rMAL();
+  toast('✅ ' + lot + ' maliyet kaydı oluşturuldu', 'ok');
+}
+
+function lotMaliyetSil(id) {
+  const u = DB.uretimKayitlari.find(r => r.id === id);
+  if (!u) { toast('Kayıt bulunamadı', 'err'); return; }
+
+  const geriYuklenecek = [];
+  if (u.hammaddeler) {
+    Object.entries(u.hammaddeler).forEach(([k, m]) => {
+      if (DB.hammadde[k]) geriYuklenecek.push(`${DB.hammadde[k].ad}: ${m} kg`);
+    });
+  }
+
+  const uyari = geriYuklenecek.length
+    ? `\n\nHammadde stokları geri yüklenecek:\n${geriYuklenecek.join('\n')}`
+    : '';
+
+  konfirm('Üretim Kaydı Sil',
+    `"${u.lot}" — ${u.urun} silinsin mi?${uyari}`, () => {
+    otoyedekAl('Lot maliyet silme: ' + u.lot);
+    // 1. Hammadde stoğunu geri yükle
+    if (u.hammaddeler) {
+      Object.entries(u.hammaddeler).forEach(([k, m]) => {
+        if (DB.hammadde[k] && m > 0) {
+          DB.hammadde[k].guncel += m;
+          // Üretim çıkış kaydını da sil
+          DB.hammadde[k].cikislar = DB.hammadde[k].cikislar.filter(
+            c => !(c.neden === 'uretim' && c.not && c.not.includes(u.lot))
+          );
+        }
+      });
+    }
+
+    // 2. Ürün stoktan sil (bu lot'a ait)
+    DB.urunStok = DB.urunStok.filter(s => s.lot !== u.lot);
+    DB.urunHareketler = DB.urunHareketler.filter(h =>
+      !(h.lot === u.lot && h.tip === 'giris')
+    );
+
+    // 3. Üretim kaydını sil
+    const idx = DB.uretimKayitlari.findIndex(r => r.id === id);
+    if (idx > -1) DB.uretimKayitlari.splice(idx, 1);
+
+    dbKaydet();
+    rMAL();
+    toast('🗑 Üretim silindi — stoklar geri yüklendi');
   });
 }
 
@@ -5583,37 +6365,377 @@ function giderDagitOnayla() {
 }
 
 function lotMaliyetDuz(id) {
-  const u = DB.uretimKayitlari.find(r=>r.id===id); if (!u) return;
+  const u = DB.uretimKayitlari.find(r => r.id === id);
+  if (!u) return;
+
+  // Bidon satırları
+  const bidonSatirlari = (u.bidonlar || []).map((b, i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <input type="text" value="${b.boy||''}" placeholder="Ebat (lt)" style="width:90px" id="lmd-bboy-${i}">
+      <input type="number" value="${b.adet||0}" placeholder="Adet" style="width:80px" id="lmd-badet-${i}" min="0">
+      <button class="btn xs dn" onclick="this.closest('[id^=lmd-bidon]')?.remove()" style="padding:3px 7px">✕</button>
+    </div>`).join('');
+
+  // Hammadde reçetesi — recete varsa onu, yoksa hammaddeler'den oluştur
+  const _recKaynak = (u.recete && u.recete.length)
+    ? u.recete
+    : Object.entries(u.hammaddeler || {}).map(([k, m]) => ({
+        hmAd: DB.hammadde[k]?.ad || k,
+        miktar: m,
+        birimF: hammaddeOrtBirim ? hammaddeOrtBirim(k) : 0
+      }));
+
+  const hmSatirlari = _recKaynak.map((r, i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <input type="text" value="${r.hmAd||r.ham||''}" placeholder="Hammadde adı" style="flex:1" id="lmd-hmad-${i}">
+      <input type="number" value="${r.miktar||0}" placeholder="Miktar (kg)" style="width:90px" id="lmd-hmmik-${i}" min="0" step="0.01" oninput="lmdHamHesapla()">
+      <input type="number" value="${r.birimF||r.birimFiyat||0}" placeholder="₺/kg" style="width:80px" id="lmd-hmfiy-${i}" min="0" step="0.01" oninput="lmdHamHesapla()">
+      <button class="btn xs dn" onclick="this.closest('div').remove();lmdHamHesapla()" style="padding:3px 7px">✕</button>
+    </div>`).join('');
+
   const body = `
-    <div class="finfo">Lot: <b>${u.lot}</b> | ${u.urun} (${u.toplamKg} kg)</div>
     <div class="fg2">
-      <div class="fr"><label>Hammadde Maliyeti (TL)</label>
-        <input id="lmd-ham" type="number" value="${u.maliyet||0}" min="0" step="0.01" oninput="lmdGuncelle()">
+      <div class="fr"><label>Lot No</label>
+        <input id="lmd-lot" type="text" value="${u.lot||''}">
       </div>
-      <div class="fr"><label>Genel Gider Payi (TL)</label>
-        <input id="lmd-gen" type="number" value="${u.genelGiderPayi||0}" min="0" step="0.01" oninput="lmdGuncelle()">
+      <div class="fr"><label>Tarih</label>
+        <input id="lmd-tarih" type="date" value="${u.tarih||''}">
       </div>
     </div>
-    <div class="fr"><label>Not</label><input id="lmd-not" type="text" value="${u.not||''}"></div>
-    <div class="fsuccess" id="lmd-sonuc" style="margin-top:8px"></div>`;
-  modalOlustur('mo-lmd','Lot Maliyet Duzenle',body,
-    `<button class="btn" onclick="mKapat('mo-lmd')">Iptal</button>
-     <button class="btn pr" onclick="lotMaliyetKaydet(${id})">Kaydet</button>`,'sm');
+    <div class="fg2">
+      <div class="fr"><label>Ürün Adı</label>
+        <input id="lmd-urun" type="text" value="${u.urun||''}">
+      </div>
+      <div class="fr"><label>Toplam Kg</label>
+        <input id="lmd-kg" type="number" value="${u.toplamKg||0}" min="0" step="0.01" oninput="lmdGuncelle()">
+      </div>
+    </div>
+    <div class="fr"><label>Not</label>
+      <input id="lmd-not" type="text" value="${u.not||''}">
+    </div>
+
+    <div style="margin-top:12px;padding:10px;background:var(--surf2);border-radius:var(--ra)">
+      <div style="font-weight:600;font-size:12px;margin-bottom:8px">📦 Bidon Dağılımı</div>
+      <div id="lmd-bidonlar">${bidonSatirlari}</div>
+      <button class="btn xs" onclick="lmdBidonEkle()" style="margin-top:4px">+ Bidon Satırı</button>
+    </div>
+
+    <div style="margin-top:10px;padding:10px;background:var(--surf2);border-radius:var(--ra)">
+      <div style="font-weight:600;font-size:12px;margin-bottom:8px">🧪 Hammadde Reçetesi</div>
+      <div style="display:flex;gap:8px;font-size:10px;color:var(--tx2);margin-bottom:4px">
+        <span style="flex:1">Hammadde</span><span style="width:90px">Miktar (kg)</span><span style="width:80px">₺/kg</span><span style="width:28px"></span>
+      </div>
+      <div id="lmd-recete">${hmSatirlari}</div>
+      <button class="btn xs" onclick="lmdHmEkle()" style="margin-top:4px">+ Hammadde Satırı</button>
+    </div>
+
+    <div style="margin-top:10px">
+      <div class="fg2">
+        <div class="fr"><label>Hammadde Maliyeti (₺)</label>
+          <input id="lmd-ham" type="number" value="${u.maliyet||0}" min="0" step="0.01" oninput="lmdGuncelle()">
+        </div>
+        <div class="fr"><label>Genel Gider Payı (₺)</label>
+          <input id="lmd-gen" type="number" value="${u.genelGiderPayi||0}" min="0" step="0.01" oninput="lmdGuncelle()">
+        </div>
+      </div>
+      <div class="fsuccess" id="lmd-sonuc" style="margin-top:8px"></div>
+    </div>`;
+
+  const mo = modalOlustur('mo-lmd', '✏️ Üretim Kaydı Düzenle — ' + u.lot, body,
+    `<button class="btn" onclick="mKapat('mo-lmd')">İptal</button>
+     <button class="btn pr" onclick="lotMaliyetKaydet(${id})">💾 Kaydet</button>`, 'xl');
   mAc('mo-lmd');
   setTimeout(lmdGuncelle, 100);
 }
-function lmdGuncelle() {
-  const h=fNum('lmd-ham'), g=fNum('lmd-gen');
-  const el=document.getElementById('lmd-sonuc');
-  const u=DB.uretimKayitlari.find(r=>r.id===parseInt(document.getElementById('mo-lmd')?.getAttribute('data-id')));
-  if(el) el.textContent=`Toplam: &#8378;${fmt(h+g)} | &#8378;${fmt((h+g)/(u?.toplamKg||1))}/kg`;
-}
-function lotMaliyetKaydet(id) {
-  const u = DB.uretimKayitlari.find(r=>r.id===id); if (!u) return;
-  u.maliyet = fNum('lmd-ham'); u.genelGiderPayi = fNum('lmd-gen'); u.not = fVal('lmd-not');
-  mKapat('mo-lmd'); dbKaydet(); rMAL(); toast('Maliyet guncellendi','ok');
+
+function lmdBidonEkle() {
+  const div = document.getElementById('lmd-bidonlar');
+  if (!div) return;
+  const i = div.children.length;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:6px';
+  row.innerHTML = `
+    <input type="text" placeholder="Ebat (lt)" style="width:90px" id="lmd-bboy-${i}">
+    <input type="number" placeholder="Adet" style="width:80px" id="lmd-badet-${i}" min="0">
+    <button class="btn xs dn" onclick="this.closest('div').remove()" style="padding:3px 7px">✕</button>`;
+  div.appendChild(row);
 }
 
+function lmdHamHesapla() {
+  // Reçetedeki hammadde maliyetini otomatik hesapla
+  let topHam = 0;
+  document.querySelectorAll('[id^="lmd-hmad-"]').forEach(el => {
+    const i = el.id.split('-').pop();
+    const mik = parseFloat(document.getElementById('lmd-hmmik-' + i)?.value) || 0;
+    const fiy = parseFloat(document.getElementById('lmd-hmfiy-' + i)?.value) || 0;
+    topHam += mik * fiy;
+  });
+  const hamEl = document.getElementById('lmd-ham');
+  if (hamEl) hamEl.value = topHam.toFixed(2);
+  lmdGuncelle();
+}
+
+function lmdHmEkle() {
+  const div = document.getElementById('lmd-recete');
+  if (!div) return;
+  const i = div.children.length;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:6px';
+  row.innerHTML = `
+    <input type="text" placeholder="Hammadde adı" style="flex:1" id="lmd-hmad-${i}">
+    <input type="number" placeholder="Miktar (kg)" style="width:90px" id="lmd-hmmik-${i}" min="0" step="0.01">
+    <input type="number" placeholder="₺/kg" style="width:80px" id="lmd-hmfiy-${i}" min="0" step="0.01">
+    <button class="btn xs dn" onclick="this.closest('div').remove()" style="padding:3px 7px">✕</button>`;
+  div.appendChild(row);
+}
+
+function lmdGuncelle() {
+  const h = fNum('lmd-ham');
+  const g = fNum('lmd-gen');
+  const kg = fNum('lmd-kg');
+  const el = document.getElementById('lmd-sonuc');
+  if (el) {
+    const top = h + g;
+    el.innerHTML = `Toplam: <b>₺${fmt(top)}</b> | <b>₺${fmt(kg > 0 ? top/kg : 0)}/kg</b>`;
+  }
+}
+
+function lotMaliyetKaydet(id) {
+  const u = DB.uretimKayitlari.find(r => r.id === id);
+  if (!u) return;
+
+  u.lot      = fVal('lmd-lot')   || u.lot;
+  u.tarih    = fVal('lmd-tarih') || u.tarih;
+  u.urun     = fVal('lmd-urun')  || u.urun;
+  u.toplamKg = fNum('lmd-kg');
+  u.maliyet  = fNum('lmd-ham');
+  u.genelGiderPayi = fNum('lmd-gen');
+  u.not      = fVal('lmd-not');
+
+  // Bidonları topla
+  const bidonDiv = document.getElementById('lmd-bidonlar');
+  if (bidonDiv) {
+    u.bidonlar = [];
+    bidonDiv.querySelectorAll('[id^="lmd-bboy-"]').forEach(el => {
+      const i = el.id.split('-').pop();
+      const boy  = el.value.trim();
+      const adet = parseInt(document.getElementById('lmd-badet-' + i)?.value) || 0;
+      if (boy && adet > 0) u.bidonlar.push({ boy, adet });
+    });
+  }
+
+  // Reçeteyi topla
+  const recDiv = document.getElementById('lmd-recete');
+  if (recDiv) {
+    u.recete = [];
+    recDiv.querySelectorAll('[id^="lmd-hmad-"]').forEach(el => {
+      const i = el.id.split('-').pop();
+      const hmAd  = el.value.trim();
+      const miktar = parseFloat(document.getElementById('lmd-hmmik-' + i)?.value) || 0;
+      const birimF = parseFloat(document.getElementById('lmd-hmfiy-' + i)?.value) || 0;
+      if (hmAd) u.recete.push({ hmAd, miktar, birimF, tutar: miktar * birimF });
+    });
+    // Hammadde maliyetini reçeteden hesapla (el ile girilmediyse)
+    if (u.recete.length > 0 && !fNum('lmd-ham')) {
+      u.maliyet = u.recete.reduce((a, r) => a + r.tutar, 0);
+    }
+  }
+
+  mKapat('mo-lmd');
+  dbKaydet();
+  rMAL();
+  toast('✅ Üretim kaydı güncellendi', 'ok');
+}
+
+
+/* ════════════════════════════════════
+   BEDELSİZ NUMUNE SAYFASI
+   ════════════════════════════════════ */
+function rBedelsiz() {
+  const p = pg('bedelsiz');
+
+  // Tüm bedelsiz hareketleri topla (cari + doğrudan stok çıkışları)
+  let liste = [];
+
+  // Cari hareketlerden bedelsiz_ver olanlar
+  Object.entries(DB.cariler).forEach(([key, c]) => {
+    (c.hareketler || []).filter(h => h.tur === 'bedelsiz_ver').forEach(h => {
+      liste.push({
+        id: 'c_' + key + '_' + h.id,
+        tarih: h.tarih,
+        kaynak: 'Cari',
+        cari: c.ad,
+        adet: h.adet || 0,
+        birim: h.birim || 0,
+        tutar: (h.adet || 0) * (h.birim || 0),
+        stokDustu: h.bedStoktan !== false,
+        bakiyeDustu: h.tahsilat > 0,
+        acik: h.acik || '',
+        harKey: key,
+        harId: h.id
+      });
+    });
+  });
+
+  // Doğrudan stok çıkışlarından bedelsiz olanlar
+  (DB.urunHareketler || []).filter(h => h.tip === 'cikis' && h.acik?.includes('BEDELSİZ')).forEach(h => {
+    // Cari hareketinden gelmiyor mu? (çift sayma olmasın)
+    const zatenVar = liste.some(x => x.tarih === h.tarih && Math.abs(x.adet - h.bidon) < 0.01);
+    if (!zatenVar) {
+      liste.push({
+        id: 'u_' + h.id,
+        tarih: h.tarih,
+        kaynak: 'Stok',
+        cari: h.cari || '—',
+        adet: h.bidon || 0,
+        birim: 0,
+        tutar: 0,
+        stokDustu: true,
+        bakiyeDustu: false,
+        acik: h.acik || '',
+        harKey: null, harId: h.id
+      });
+    }
+  });
+
+  liste.sort((a, b) => (b.tarih || '').localeCompare(a.tarih || ''));
+
+  // Toplamlar
+  const topAdet  = liste.reduce((s, x) => s + x.adet, 0);
+  const topTutar = liste.reduce((s, x) => s + x.tutar, 0);
+  const topStok  = liste.filter(x => x.stokDustu).reduce((s, x) => s + x.adet, 0);
+
+  const satirlar = liste.map(x => `<tr>
+    <td class="tnw">${td(x.tarih)}</td>
+    <td style="font-weight:600;font-size:12px">${x.cari}</td>
+    <td class="tr">${x.adet} bidon</td>
+    <td class="tr" style="color:var(--tx2)">${x.birim ? '₺'+fmt(x.birim) : '—'}</td>
+    <td class="tr" style="color:var(--r);font-weight:600">${x.tutar ? '₺'+fmt(x.tutar) : '—'}</td>
+    <td>${x.stokDustu  ? badge('✅ Düştü','bG') : badge('⚠️ Düşmedi','bR')}</td>
+    <td>${x.bakiyeDustu ? badge('✅ Düştü','bG') : badge('—','bX')}</td>
+    <td style="font-size:11px;color:var(--tx2)">${x.acik}</td>
+    <td><div class="td-actions">
+      ${x.harKey ? `<button class="btn xs te" onclick="cariDetayGit('${x.harKey}');setTimeout(()=>cariHarAc('${x.harKey}',${x.harId}),300)" title="Düzenle">✏️</button>` : ''}
+    </div></td>
+  </tr>`).join('');
+
+  p.innerHTML = `
+    <div class="sg">
+      ${statCard('Toplam Verilen', topAdet+' bidon', liste.length+' kayıt', 'R')}
+      ${statCard('Stoktan Düşülen', topStok+' bidon', '', 'G')}
+      ${statCard('Toplam Maliyet', '₺'+fmt(topTutar), 'Birim fiyat × adet', 'A')}
+    </div>
+
+    <div class="card">
+      <div class="ch">🎁 Bedelsiz Numune Kayıtları
+        <div class="ch-actions">
+          <button class="btn xs pr" onclick="bedelsizEkleAc()">+ Bedelsiz Ekle</button>
+        </div>
+      </div>
+      <div class="tw"><table id="tbl-bedelsiz">
+        <thead><tr>
+          <th>Tarih</th><th>Müşteri / Firma</th>
+          <th class="tr">Adet</th><th class="tr">Birim</th><th class="tr">Maliyet</th>
+          <th>Stok</th><th>Bakiye</th><th>Açıklama</th><th></th>
+        </tr></thead>
+        <tbody>${satirlar || trEmpty(9, 'Bedelsiz numune kaydı yok')}</tbody>
+      </table></div>
+      <div style="padding:9px 15px;background:var(--surf2);border-top:1px solid var(--bdr);font-size:12px">
+        Toplam: <b>${topAdet} bidon</b> verildi &nbsp;|&nbsp; Maliyet: <b style="color:var(--r)">₺${fmt(topTutar)}</b>
+      </div>
+    </div>`;
+}
+
+function bedelsizEkleAc() {
+  // Cari seçimi ile bedelsiz ekleme — cari hareketine yönlendir
+  const cariOpts = Object.entries(DB.cariler)
+    .map(([k,c]) => `<option value="${k}">${c.ad}</option>`).join('');
+
+  const body = `
+    <div class="finfo" style="margin-bottom:10px">Bedelsiz numune, seçilen carinin hareket sayfasına <b>bedelsiz_ver</b> olarak eklenecek. Stok ve bakiyeyi otomatik düşer.</div>
+    <div class="fr"><label>Müşteri *</label><select id="bed-cari">${cariOpts}</select></div>
+    <div class="fg2" style="margin-top:8px">
+      <div class="fr"><label>Tarih</label><input id="bed-tarih" type="date" value="${today()}"></div>
+      <div class="fr"><label>Adet *</label><input id="bed-adet" type="number" value="1" min="1"></div>
+    </div>
+    <div class="fg2">
+      <div class="fr"><label>Birim Değer (₺)</label><input id="bed-birim" type="number" value="2250" min="0" step="0.01"></div>
+      <div class="fr"><label>Açıklama</label><input id="bed-acik" type="text" placeholder="Opsiyonel"></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:12px">
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="bed-stok" checked> Stoktan düş
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="bed-bakiye" checked> Bakiyeye yansıt
+      </label>
+    </div>`;
+
+  modalOlustur('mo-bed', '🎁 Bedelsiz Numune Ekle', body,
+    `<button class="btn" onclick="mKapat('mo-bed')">İptal</button>
+     <button class="btn pr" onclick="bedelsizKaydet()">💾 Kaydet</button>`, 'w');
+  mAc('mo-bed');
+}
+
+function bedelsizKaydet() {
+  const cariKey = fVal('bed-cari');
+  const c = DB.cariler[cariKey];
+  if (!c) { toast('Cari seçiniz!', 'err'); return; }
+  const adet   = fInt('bed-adet');
+  const birim  = fNum('bed-birim');
+  const tarih  = fVal('bed-tarih');
+  const acik   = fVal('bed-acik');
+  const stokDus   = document.getElementById('bed-stok')?.checked !== false;
+  const bakiyeDus = document.getElementById('bed-bakiye')?.checked !== false;
+
+  if (!adet) { toast('Adet giriniz!', 'err'); return; }
+
+  const tutar = adet * birim;
+
+  // Cari hareketine ekle
+  const harId = nid('ci');
+  const har = {
+    id: harId, tarih, tur: 'bedelsiz_ver',
+    fatno: '', adet, birim,
+    tutar: 0,
+    tahsilat: bakiyeDus ? tutar : 0,
+    bakiye: 0,
+    acik: 'BEDELSİZ NUMUNE' + (acik ? ' — ' + acik : ''),
+    bedStoktan: stokDus,
+    bedBorcYaz: false,
+    bedBorcDus: bakiyeDus
+  };
+
+  c.hareketler.push(har);
+  c.hareketler = _bakiyeHesapla(c.hareketler);
+
+  // Stoktan düş
+  if (stokDus) {
+    if (!DB.urunStok) DB.urunStok = [];
+    if (!DB.urunHareketler) DB.urunHareketler = [];
+    let kalanDus = adet;
+    for (const u of DB.urunStok) {
+      const mevcut = urunKalanStok(u.lot);
+      if (mevcut <= 0) continue;
+      const cikan = Math.min(kalanDus, mevcut);
+      DB.urunHareketler.push({
+        id: nid('uhar'), tarih, tip: 'cikis', lot: u.lot,
+        cari: c.ad, bidon: cikan,
+        kg: cikan * parseFloat(u.bidonBoy || 5),
+        acik: 'BEDELSİZ NUMUNE — ' + c.ad + (acik ? ' / ' + acik : '')
+      });
+      kalanDus -= cikan;
+      if (kalanDus <= 0) break;
+    }
+    if (kalanDus > 0) toast('⚠️ Stok yetersiz! ' + kalanDus + ' bidon eksik.', 'warn');
+  }
+
+  mKapat('mo-bed');
+  dbKaydet();
+  cariNavGuncelle();
+  rBedelsiz();
+  toast('✅ Bedelsiz numune kaydedildi' + (stokDus ? ' — stoktan düşüldü' : ''), 'ok');
+}
 
 function rFAT() {
   const p = pg('fatura');
@@ -6112,6 +7234,7 @@ function fatSil(id) {
 
 /* ── NAVİGASYON ── */
 function go(panel, el) {
+  if (window.innerWidth <= 768) sbKapat();
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(x => x.classList.remove('active'));
 
@@ -6142,6 +7265,7 @@ function render() {
     hammadde:    rHMM,
     urun_stok:   rUS,
     maliyet:     rMAL,
+    bedelsiz:    rBedelsiz,
     fatura:      rFAT,
     ayarlar:     rAyarlar,
     rapor:       rRapor,
@@ -6765,48 +7889,88 @@ async function supaYukle() {
   }
 }
 
-async function supaKaydet() {
+
+
+
+/* ── OTOMATİK YEDEK SİSTEMİ ── */
+const YEDEK_SK = 'mlk_v4_otoyedek'; // localStorage key
+const YEDEK_MAX = 24; // max 24 snapshot (saatlik = 1 gün geçmiş)
+
+function otoyedekAl(sebep) {
   try {
-    const res = await fetch(SUPA_URL + '/rest/v1/mlk_data', {
-      method: 'POST',
-      headers: { ...SUPA_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
-      body: JSON.stringify({ id: 'main', data: DB, updated_at: new Date().toISOString() })
+    const raw = localStorage.getItem(YEDEK_SK);
+    const liste = raw ? JSON.parse(raw) : [];
+    liste.unshift({
+      zaman: new Date().toISOString(),
+      sebep: sebep || 'Otomatik',
+      data: JSON.parse(JSON.stringify(DB))
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const badge = document.getElementById('cloud-badge');
-    if (badge) {
-      badge.className = 'cloud-badge ok';
-      badge.textContent = '☁️ ' + new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'});
-      setTimeout(() => { if (badge) { badge.className = 'cloud-badge'; badge.textContent = '☁️ Bulut'; } }, 4000);
-    }
-    return true;
+    // Max YEDEK_MAX tane tut
+    if (liste.length > YEDEK_MAX) liste.splice(YEDEK_MAX);
+    localStorage.setItem(YEDEK_SK, JSON.stringify(liste));
   } catch(e) {
-    console.error('Supabase kayıt hatası:', e);
-    const badge = document.getElementById('cloud-badge');
-    if (badge) { badge.className = 'cloud-badge err'; badge.textContent = '☁️ Hata'; }
-    return false;
+    console.warn('Otoyedek alınamadı:', e);
   }
 }
 
-async function supaYukle() {
+function otoyedekListesi() {
   try {
-    const res = await fetch(SUPA_URL + '/rest/v1/mlk_data?id=eq.main&select=data,updated_at', {
-      headers: SUPA_HEADERS
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const rows = await res.json();
-    if (rows && rows.length > 0 && rows[0].data && Object.keys(rows[0].data).length > 0) {
-      return rows[0];
-    }
-    return null;
-  } catch(e) {
-    console.error('Supabase yükleme hatası:', e);
-    return null;
-  }
+    const raw = localStorage.getItem(YEDEK_SK);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
 }
 
+function otoyedekGeriYukle(idx) {
+  const liste = otoyedekListesi();
+  const yedek = liste[idx];
+  if (!yedek) { toast('Yedek bulunamadı', 'err'); return; }
+  const zaman = new Date(yedek.zaman).toLocaleString('tr-TR');
+  konfirm('Yedeği Geri Yükle',
+    `${zaman} tarihli yedek yüklensin mi?\n\n⚠️ Mevcut veriler değişecek!`, () => {
+    otoyedekAl('Geri yükleme öncesi'); // Önce mevcut veriyi yedekle
+    DB = JSON.parse(JSON.stringify(yedek.data));
+    if (!DB.ids) DB.ids = {};
+    localStorage.setItem(SK, JSON.stringify(DB));
+    cariNavGuncelle();
+    go(AP);
+    toast('✅ ' + zaman + ' yedeği yüklendi', 'ok');
+    // Buluta da kaydet
+    supaKaydet().catch(() => {});
+  });
+}
 
-const _sortState = {}; // { tableId: { col, dir } }
+function otoyedekGoster() {
+  const liste = otoyedekListesi();
+  if (!liste.length) { toast('Henüz otomatik yedek yok', 'err'); return; }
+
+  const satirlar = liste.map((y, i) => {
+    const zaman = new Date(y.zaman).toLocaleString('tr-TR');
+    const cariSay = Object.keys(y.data?.cariler || {}).length;
+    const urSay = (y.data?.uretimKayitlari || []).length;
+    return `<tr>
+      <td style="font-size:12px">${zaman}</td>
+      <td>${y.sebep}</td>
+      <td style="font-size:11px;color:var(--tx2)">${cariSay} cari · ${urSay} üretim</td>
+      <td><button class="btn xs gn" onclick="mKapat('mo-otoyedek');otoyedekGeriYukle(${i})">↩️ Yükle</button></td>
+    </tr>`;
+  }).join('');
+
+  const body = `
+    <div class="finfo" style="margin-bottom:10px">Son ${liste.length} otomatik yedek. Her önemli işlem öncesi alınır.</div>
+    <div class="tw"><table>
+      <thead><tr><th>Zaman</th><th>Sebep</th><th>İçerik</th><th></th></tr></thead>
+      <tbody>${satirlar}</tbody>
+    </table></div>`;
+
+  modalOlustur('mo-otoyedek', '🕐 Otomatik Yedekler', body,
+    `<button class="btn pr" onclick="mKapat('mo-otoyedek')">Kapat</button>`, 'xl');
+  mAc('mo-otoyedek');
+}
+
+// Her önemli silme işlemi öncesi otoyedek al
+const _origKonfirm = window.konfirm;
+
+
 
 function thSortable(tableId, col, label) {
   const st = _sortState[tableId] || {};
@@ -6881,6 +8045,17 @@ function yetkiYok() {
 
 function appInit() {
   dbYukle();
+  // Tüm cari bakiyeleri açılışta yeniden hesapla (negatif bakiye desteği için)
+  if (DB && DB.cariler) {
+    let degisti = false;
+    Object.values(DB.cariler).forEach(c => {
+      if (c.hareketler?.length) {
+        c.hareketler = _bakiyeHesapla(c.hareketler);
+        degisti = true;
+      }
+    });
+    if (degisti) localStorage.setItem(SK, JSON.stringify(DB));
+  }
   cariNavGuncelle();
   document.getElementById('pdate').textContent = new Date().toLocaleDateString('tr-TR', {
     weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
