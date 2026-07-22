@@ -1106,10 +1106,29 @@ function setSyn(s) {
   const t = document.getElementById('stxt');
   if (!d || !t) return;
   d.className = 'sdot' + (s === 'sp' ? ' sp' : '');
-  if (s === 'ok')       { t.textContent = 'Yerel kayıt OK'; d.style.background = ''; }
-  else if (s === 'sp')  { t.textContent = 'Kaydediliyor...'; d.style.background = '#f59e0b'; }
-  else if (s === 'cloud'){ t.textContent = 'Bulut sync OK'; d.style.background = '#2563eb'; }
-  else                  { t.textContent = 'Kayıt hatası!'; d.style.background = '#dc2626'; }
+  const saat = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'});
+  if (s === 'ok') {
+    t.textContent = '💾 Yerel kayıt';
+    d.style.background = '#f59e0b';
+    t.style.color = '#f59e0b';
+    t.title = 'Sadece bu bilgisayarda kaydedildi. Buluta göndermek için bekleyin.';
+  } else if (s === 'sp') {
+    t.textContent = '⏳ Kaydediliyor...';
+    d.style.background = '#f59e0b';
+    t.style.color = '#f59e0b';
+  } else if (s === 'cloud') {
+    t.textContent = '☁️ Bulut OK ' + saat;
+    d.style.background = '#16a34a';
+    t.style.color = '#16a34a';
+    t.title = 'Supabase\'e başarıyla kaydedildi — ' + saat;
+  } else if (s === 'e') {
+    t.textContent = '❌ Bulut HATASI!';
+    d.style.background = '#dc2626';
+    t.style.color = '#dc2626';
+    t.title = 'Buluta kaydedilemedi! Manuel yedek alın.';
+    // Kullanıcıyı uyar
+    toast('⚠️ Buluta kaydedilemedi! ☁️ Bulut butonundan manuel yedekleyin.', 'err');
+  }
 }
 
 /* ── ID ÜRETİCİ ── */
@@ -3435,7 +3454,7 @@ function _rHT_kasa(el) {
       ${x.tip==='GELİR'?'+':'-'}₺${fmt(x.tutar)}
     </td>
     <td><div class="td-actions">
-      <button class="btn xs te" onclick="kasaHarDuz('${x.tip2}',${x.id})">✏️</button>
+      <button class="btn xs te" onclick="${x.tip2==='kag'?'kaGAc':'kaCAc'}(${x.id})">✏️</button>
       <button class="btn xs dn" onclick="kasaHarSil('${x.tip2}',${x.id})">🗑</button>
     </div></td>
   </tr>`).join('');
@@ -3452,8 +3471,8 @@ function _rHT_kasa(el) {
       <div class="card">
         <div class="ch">💰 Kasa Hareketleri
           <div class="ch-actions">
-            <button class="btn xs gn" onclick="kasaHarEkle('gelir')">+ Giriş</button>
-            <button class="btn xs dn" onclick="kasaHarEkle('gider')">+ Çıkış</button>
+            <button class="btn xs gn" onclick="kaGAc(null);setTimeout(()=>_rHT_kasa(document.getElementById('ht-tab-content')),500)">+ Giriş</button>
+            <button class="btn xs dn" onclick="kaCAc(null);setTimeout(()=>_rHT_kasa(document.getElementById('ht-tab-content')),500)">+ Çıkış</button>
           </div>
         </div>
         <div class="tb" style="flex-wrap:wrap;gap:6px">
@@ -7480,7 +7499,14 @@ function rAyarlar() {
         <button class="btn te" onclick="importJSON()" style="justify-content:flex-start">📤 Yedekten Geri Yükle</button>
         <button class="btn am" onclick="supaYukleForce()" style="justify-content:flex-start">☁️ Buluttan Geri Yükle</button>
         <hr class="divider">
-        <button class="btn dn" onclick="verileriSifirla()" style="justify-content:flex-start">⚠️ Tüm Verileri Sıfırla</button>
+        <div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:var(--ra);padding:10px 12px">
+          <div style="font-size:11px;color:#dc2626;margin-bottom:8px;font-weight:600">
+            ⚠️ Tehlikeli Alan — Geri alınamaz!
+          </div>
+          <button class="btn dn" onclick="verileriSifirla()" style="justify-content:flex-start;width:100%">
+            🗑 Tüm Verileri Sıfırla (Şifre Gerekli)
+          </button>
+        </div>
       </div>
     </div>`;
 }
@@ -7488,13 +7514,39 @@ function rAyarlar() {
 
 function verileriSifirla() {
   if (!canDo('db_sifirla')) { yetkiYok('Veritabanı sıfırlama yetkisi yok!'); return; }
-  konfirm('⚠️ VERİLERİ SIFIRLA', 'TÜM veriler silinip fabrika ayarlarına dönülecek! Bu işlem GERİ ALINAMAZ. Emin misiniz?', () => {
+
+  // Şifre sor
+  const body = `
+    <div class="fwarn" style="margin-bottom:12px">
+      ⚠️ <b>UYARI:</b> Bu işlem TÜM verileri kalıcı olarak siler. Geri alınamaz!
+    </div>
+    <div class="fr"><label>Onaylamak için yönetici şifrenizi girin *</label>
+      <input id="sifirla-sifre" type="password" placeholder="Şifreniz" autocomplete="off">
+    </div>`;
+
+  modalOlustur('mo-sifirla', '🗑 Verileri Sıfırla', body,
+    `<button class="btn" onclick="mKapat('mo-sifirla')">İptal</button>
+     <button class="btn dn" onclick="verileriSifirlaOnay()">⚠️ Sıfırla</button>`, 'sm');
+  mAc('mo-sifirla');
+}
+
+function verileriSifirlaOnay() {
+  const sifre = document.getElementById('sifirla-sifre')?.value;
+  const user  = USERS.find(u => u.username === currentUser?.username);
+  if (!sifre || sifre !== user?.password) {
+    toast('❌ Şifre yanlış!', 'err');
+    return;
+  }
+  mKapat('mo-sifirla');
+  konfirm('⚠️ SON ONAY', 'Şifre doğrulandı. TÜM VERİLER SİLİNECEK! Devam edilsin mi?', () => {
     localStorage.removeItem('mlk_v4');
+    localStorage.removeItem('mlk_v4_users');
+    localStorage.removeItem('mlk_v4_ts');
     DB = JSON.parse(JSON.stringify(DEF_DB));
     dbKaydet();
     render();
-    toast('⚠️ Veriler sıfırlandı', 'err');
-  }, '⚠️ Evet, Sıfırla', 'btn dn');
+    toast('⚠️ Tüm veriler sıfırlandı', 'err');
+  }, '⚠️ Evet, Hepsini Sil', 'btn dn');
 }
 
 /* ── KULLANICI YÖNETİMİ ── */
@@ -7854,17 +7906,19 @@ async function supaKaydet() {
       body: JSON.stringify(payload)
     });
     if (!res.ok) {
+      // PATCH başarısız → POST dene
       const res2 = await fetch(SUPA_URL + '/rest/v1/mlk_data', {
         method: 'POST',
         headers: { ...SUPA_HEADERS, 'Prefer': 'resolution=merge-duplicates' },
         body: JSON.stringify(payload)
       });
-      return res2.ok;
+      if (!res2.ok) { setSyn('e'); return false; }
     }
     localStorage.setItem(SK + '_ts', Date.now().toString());
+    setSyn('cloud');
     return true;
   } catch(e) {
-    // Sessizce geç — yerel kayıt zaten yapıldı
+    setSyn('e'); // Hata görünür olsun
     return false;
   }
 }
@@ -7971,6 +8025,8 @@ function otoyedekGoster() {
 const _origKonfirm = window.konfirm;
 
 
+
+const _sortState = {};
 
 function thSortable(tableId, col, label) {
   const st = _sortState[tableId] || {};
